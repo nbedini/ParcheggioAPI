@@ -1,0 +1,19 @@
+﻿<Window x:Class="Parcheggio.Views.ParcheggioEsistente"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Parcheggio.Views"
+        mc:Ignorable="d"
+        Title="Seleziona Parcheggio Esistente" Height="275" Width="591" Icon="/Views/Icon.ico">
+    <Grid>
+        <Label HorizontalContentAlignment="Center" FontSize="40" Content="Seleziona Parcheggio Esistente" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" Width="571"/>
+        <ComboBox SelectedValue="{Binding NomeParcheggioSelezionato}" ItemsSource="{Binding ListaParcheggiEsistenti}" FontSize="25" HorizontalAlignment="Center" Margin="0,109,0,0" VerticalAlignment="Top" Width="250"/>
+        <Button Background="{Binding BackgroundAcceptButton}" Click="ConfermaParcheggioClick" FontSize="20" HorizontalAlignment="Left" Margin="206,177,0,0" VerticalAlignment="Top" Height="40">
+            <Image Source="/Views/Accept.ico" RenderTransformOrigin="0.5,0.5"/>
+        </Button>
+        <Button Background="{Binding BackgroundDeleteButton}" Click="EliminaParcheggioClick" FontSize="20"  HorizontalAlignment="Left" Margin="324,177,0,0" VerticalAlignment="Top" Height="40">
+            <Image Source="/Views/RecycleBin.ico"/>
+        </Button>
+    </Grid>
+</Window>

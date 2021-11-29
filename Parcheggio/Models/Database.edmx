@@ -1,0 +1,477 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<edmx:Edmx Version="3.0" xmlns:edmx="http://schemas.microsoft.com/ado/2009/11/edmx">
+  <!-- EF Runtime content -->
+  <edmx:Runtime>
+    <!-- SSDL content -->
+    <edmx:StorageModels>
+      <Schema Namespace="ParkingSystemModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <EntityType Name="ParkingAmounts">
+          <Key>
+            <PropertyRef Name="Giorno" />
+          </Key>
+          <Property Name="Giorno" Type="datetime" Nullable="false" />
+          <Property Name="IncassoTotale" Type="varchar" MaxLength="50" Nullable="false" />
+          <Property Name="NomeParcheggio" Type="varchar" MaxLength="200" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ParkingCosts">
+          <Key>
+            <PropertyRef Name="TipoVeicolo" />
+          </Key>
+          <Property Name="TipoVeicolo" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Tariffa" Type="float" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ParkingHistorys">
+          <Key>
+            <PropertyRef Name="IDStorico" />
+          </Key>
+          <Property Name="IDStorico" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Targa" Type="varchar" MaxLength="7" Nullable="false" />
+          <Property Name="DataOrarioEntrata" Type="datetime" Nullable="false" />
+          <Property Name="DataOrarioUscita" Type="datetime" Nullable="false" />
+          <Property Name="TempoTrascorso" Type="time" Precision="7" Nullable="false" />
+          <Property Name="Tariffa" Type="float" Nullable="false" />
+          <Property Name="Riga" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="Colonna" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="TipoVeicolo" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="NomeParcheggio" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="Propietario" Type="char" MaxLength="16" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Parkings">
+          <Key>
+            <PropertyRef Name="NomeParcheggio" />
+          </Key>
+          <Property Name="Righe" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="Colonne" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="NomeParcheggio" Type="varchar" MaxLength="200" Nullable="false" />
+        </EntityType>
+        <EntityType Name="ParkingStatuss">
+          <Key>
+            <PropertyRef Name="Targa" />
+          </Key>
+          <Property Name="Targa" Type="char" MaxLength="7" Nullable="false" />
+          <Property Name="DataOrarioEntrata" Type="datetime" Nullable="false" />
+          <Property Name="Riga" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="Colonna" Type="varchar" MaxLength="2" Nullable="false" />
+          <Property Name="NomeParcheggio" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="TipoVeicolo" Type="varchar" MaxLength="200" Nullable="false" />
+        </EntityType>
+        <EntityType Name="Persons">
+          <Key>
+            <PropertyRef Name="CodiceFiscale" />
+          </Key>
+          <Property Name="Nome" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="Cognome" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="DataNascita" Type="date" Nullable="false" />
+          <Property Name="CodiceFiscale" Type="char" MaxLength="16" Nullable="false" />
+        </EntityType>
+        <EntityType Name="sysdiagrams">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="nvarchar" MaxLength="128" Nullable="false" />
+          <Property Name="principal_id" Type="int" Nullable="false" />
+          <Property Name="diagram_id" Type="int" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="version" Type="int" />
+          <Property Name="definition" Type="varbinary(max)" />
+        </EntityType>
+        <EntityType Name="Vehicles">
+          <Key>
+            <PropertyRef Name="Targa" />
+          </Key>
+          <Property Name="Marca" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="Modello" Type="varchar" MaxLength="200" Nullable="false" />
+          <Property Name="Targa" Type="varchar" MaxLength="7" Nullable="false" />
+          <Property Name="Propietario" Type="char" MaxLength="16" Nullable="false" />
+          <Property Name="TipoVeicolo" Type="varchar" MaxLength="200" Nullable="false" />
+        </EntityType>
+        <Association Name="FK_ParkingAmounts_Parkings">
+          <End Role="Parkings" Type="Self.Parkings" Multiplicity="1" />
+          <End Role="ParkingAmounts" Type="Self.ParkingAmounts" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Parkings">
+              <PropertyRef Name="NomeParcheggio" />
+            </Principal>
+            <Dependent Role="ParkingAmounts">
+              <PropertyRef Name="NomeParcheggio" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParkingHistorys_ParkingCosts">
+          <End Role="ParkingCosts" Type="Self.ParkingCosts" Multiplicity="1" />
+          <End Role="ParkingHistorys" Type="Self.ParkingHistorys" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ParkingCosts">
+              <PropertyRef Name="TipoVeicolo" />
+            </Principal>
+            <Dependent Role="ParkingHistorys">
+              <PropertyRef Name="TipoVeicolo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParkingHistorys_Persons">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="1" />
+          <End Role="ParkingHistorys" Type="Self.ParkingHistorys" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="CodiceFiscale" />
+            </Principal>
+            <Dependent Role="ParkingHistorys">
+              <PropertyRef Name="Propietario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParkingStatuss_Parkings">
+          <End Role="Parkings" Type="Self.Parkings" Multiplicity="1" />
+          <End Role="ParkingStatuss" Type="Self.ParkingStatuss" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Parkings">
+              <PropertyRef Name="NomeParcheggio" />
+            </Principal>
+            <Dependent Role="ParkingStatuss">
+              <PropertyRef Name="NomeParcheggio" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Vehicles_Persons">
+          <End Role="Persons" Type="Self.Persons" Multiplicity="1" />
+          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="CodiceFiscale" />
+            </Principal>
+            <Dependent Role="Vehicles">
+              <PropertyRef Name="Propietario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ParkingSystemModelStoreContainer">
+          <EntitySet Name="ParkingAmounts" EntityType="Self.ParkingAmounts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ParkingCosts" EntityType="Self.ParkingCosts" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ParkingHistorys" EntityType="Self.ParkingHistorys" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Parkings" EntityType="Self.Parkings" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ParkingStatuss" EntityType="Self.ParkingStatuss" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Persons" EntityType="Self.Persons" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Vehicles" EntityType="Self.Vehicles" Schema="dbo" store:Type="Tables" />
+          <AssociationSet Name="FK_ParkingAmounts_Parkings" Association="Self.FK_ParkingAmounts_Parkings">
+            <End Role="Parkings" EntitySet="Parkings" />
+            <End Role="ParkingAmounts" EntitySet="ParkingAmounts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParkingHistorys_ParkingCosts" Association="Self.FK_ParkingHistorys_ParkingCosts">
+            <End Role="ParkingCosts" EntitySet="ParkingCosts" />
+            <End Role="ParkingHistorys" EntitySet="ParkingHistorys" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParkingHistorys_Persons" Association="Self.FK_ParkingHistorys_Persons">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="ParkingHistorys" EntitySet="ParkingHistorys" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParkingStatuss_Parkings" Association="Self.FK_ParkingStatuss_Parkings">
+            <End Role="Parkings" EntitySet="Parkings" />
+            <End Role="ParkingStatuss" EntitySet="ParkingStatuss" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Vehicles_Persons" Association="Self.FK_Vehicles_Persons">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="Vehicles" EntitySet="Vehicles" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:StorageModels>
+    <!-- CSDL content -->
+    <edmx:ConceptualModels>
+      <Schema Namespace="ParkingSystemModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+        <EntityType Name="ParkingAmount">
+          <Key>
+            <PropertyRef Name="Giorno" />
+          </Key>
+          <Property Name="Giorno" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="IncassoTotale" Type="String" MaxLength="50" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NomeParcheggio" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Parking" Relationship="Self.FK_ParkingAmounts_Parkings" FromRole="ParkingAmounts" ToRole="Parkings" />
+        </EntityType>
+        <EntityType Name="ParkingCost">
+          <Key>
+            <PropertyRef Name="TipoVeicolo" />
+          </Key>
+          <Property Name="TipoVeicolo" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Tariffa" Type="Double" Nullable="false" />
+          <NavigationProperty Name="ParkingHistorys" Relationship="Self.FK_ParkingHistorys_ParkingCosts" FromRole="ParkingCosts" ToRole="ParkingHistorys" />
+        </EntityType>
+        <EntityType Name="ParkingHistory">
+          <Key>
+            <PropertyRef Name="IDStorico" />
+          </Key>
+          <Property Name="IDStorico" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Targa" Type="String" MaxLength="7" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="DataOrarioEntrata" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="DataOrarioUscita" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="TempoTrascorso" Type="Time" Nullable="false" Precision="7" />
+          <Property Name="Tariffa" Type="Double" Nullable="false" />
+          <Property Name="Riga" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Colonna" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TipoVeicolo" Type="String" MaxLength="100" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NomeParcheggio" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Propietario" Type="String" MaxLength="16" FixedLength="true" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="ParkingCost" Relationship="Self.FK_ParkingHistorys_ParkingCosts" FromRole="ParkingHistorys" ToRole="ParkingCosts" />
+          <NavigationProperty Name="Person" Relationship="Self.FK_ParkingHistorys_Persons" FromRole="ParkingHistorys" ToRole="Persons" />
+        </EntityType>
+        <EntityType Name="Parking">
+          <Key>
+            <PropertyRef Name="NomeParcheggio" />
+          </Key>
+          <Property Name="Righe" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Colonne" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NomeParcheggio" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="ParkingAmounts" Relationship="Self.FK_ParkingAmounts_Parkings" FromRole="Parkings" ToRole="ParkingAmounts" />
+          <NavigationProperty Name="ParkingStatusses" Relationship="Self.FK_ParkingStatuss_Parkings" FromRole="Parkings" ToRole="ParkingStatuss" />
+        </EntityType>
+        <EntityType Name="ParkingStatuss">
+          <Key>
+            <PropertyRef Name="Targa" />
+          </Key>
+          <Property Name="Targa" Type="String" MaxLength="7" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="DataOrarioEntrata" Type="DateTime" Nullable="false" Precision="3" />
+          <Property Name="Riga" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Colonna" Type="String" MaxLength="2" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="NomeParcheggio" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="TipoVeicolo" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Parking" Relationship="Self.FK_ParkingStatuss_Parkings" FromRole="ParkingStatuss" ToRole="Parkings" />
+        </EntityType>
+        <EntityType Name="Person">
+          <Key>
+            <PropertyRef Name="CodiceFiscale" />
+          </Key>
+          <Property Name="Nome" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Cognome" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="DataNascita" Type="DateTime" Nullable="false" Precision="0" />
+          <Property Name="CodiceFiscale" Type="String" MaxLength="16" FixedLength="true" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="ParkingHistorys" Relationship="Self.FK_ParkingHistorys_Persons" FromRole="Persons" ToRole="ParkingHistorys" />
+          <NavigationProperty Name="Vehicles" Relationship="Self.FK_Vehicles_Persons" FromRole="Persons" ToRole="Vehicles" />
+        </EntityType>
+        <EntityType Name="sysdiagram">
+          <Key>
+            <PropertyRef Name="diagram_id" />
+          </Key>
+          <Property Name="name" Type="String" MaxLength="128" FixedLength="false" Unicode="true" Nullable="false" />
+          <Property Name="principal_id" Type="Int32" Nullable="false" />
+          <Property Name="diagram_id" Type="Int32" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="version" Type="Int32" />
+          <Property Name="definition" Type="Binary" MaxLength="Max" FixedLength="false" />
+        </EntityType>
+        <EntityType Name="Vehicle">
+          <Key>
+            <PropertyRef Name="Targa" />
+          </Key>
+          <Property Name="Marca" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Modello" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Targa" Type="String" MaxLength="7" FixedLength="false" Unicode="false" Nullable="false" />
+          <Property Name="Propietario" Type="String" MaxLength="16" FixedLength="true" Unicode="false" Nullable="false" />
+          <Property Name="TipoVeicolo" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
+          <NavigationProperty Name="Person" Relationship="Self.FK_Vehicles_Persons" FromRole="Vehicles" ToRole="Persons" />
+        </EntityType>
+        <Association Name="FK_ParkingAmounts_Parkings">
+          <End Role="Parkings" Type="Self.Parking" Multiplicity="1" />
+          <End Role="ParkingAmounts" Type="Self.ParkingAmount" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Parkings">
+              <PropertyRef Name="NomeParcheggio" />
+            </Principal>
+            <Dependent Role="ParkingAmounts">
+              <PropertyRef Name="NomeParcheggio" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParkingHistorys_ParkingCosts">
+          <End Role="ParkingCosts" Type="Self.ParkingCost" Multiplicity="1" />
+          <End Role="ParkingHistorys" Type="Self.ParkingHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="ParkingCosts">
+              <PropertyRef Name="TipoVeicolo" />
+            </Principal>
+            <Dependent Role="ParkingHistorys">
+              <PropertyRef Name="TipoVeicolo" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParkingHistorys_Persons">
+          <End Role="Persons" Type="Self.Person" Multiplicity="1" />
+          <End Role="ParkingHistorys" Type="Self.ParkingHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="CodiceFiscale" />
+            </Principal>
+            <Dependent Role="ParkingHistorys">
+              <PropertyRef Name="Propietario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParkingStatuss_Parkings">
+          <End Role="Parkings" Type="Self.Parking" Multiplicity="1" />
+          <End Role="ParkingStatuss" Type="Self.ParkingStatuss" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Parkings">
+              <PropertyRef Name="NomeParcheggio" />
+            </Principal>
+            <Dependent Role="ParkingStatuss">
+              <PropertyRef Name="NomeParcheggio" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_Vehicles_Persons">
+          <End Role="Persons" Type="Self.Person" Multiplicity="1" />
+          <End Role="Vehicles" Type="Self.Vehicle" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Persons">
+              <PropertyRef Name="CodiceFiscale" />
+            </Principal>
+            <Dependent Role="Vehicles">
+              <PropertyRef Name="Propietario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <EntityContainer Name="ParkingSystemEntities" annotation:LazyLoadingEnabled="true">
+          <EntitySet Name="ParkingAmounts" EntityType="Self.ParkingAmount" />
+          <EntitySet Name="ParkingCosts" EntityType="Self.ParkingCost" />
+          <EntitySet Name="ParkingHistorys" EntityType="Self.ParkingHistory" />
+          <EntitySet Name="Parkings" EntityType="Self.Parking" />
+          <EntitySet Name="ParkingStatusses" EntityType="Self.ParkingStatuss" />
+          <EntitySet Name="Persons" EntityType="Self.Person" />
+          <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagram" />
+          <EntitySet Name="Vehicles" EntityType="Self.Vehicle" />
+          <AssociationSet Name="FK_ParkingAmounts_Parkings" Association="Self.FK_ParkingAmounts_Parkings">
+            <End Role="Parkings" EntitySet="Parkings" />
+            <End Role="ParkingAmounts" EntitySet="ParkingAmounts" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParkingHistorys_ParkingCosts" Association="Self.FK_ParkingHistorys_ParkingCosts">
+            <End Role="ParkingCosts" EntitySet="ParkingCosts" />
+            <End Role="ParkingHistorys" EntitySet="ParkingHistorys" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParkingHistorys_Persons" Association="Self.FK_ParkingHistorys_Persons">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="ParkingHistorys" EntitySet="ParkingHistorys" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParkingStatuss_Parkings" Association="Self.FK_ParkingStatuss_Parkings">
+            <End Role="Parkings" EntitySet="Parkings" />
+            <End Role="ParkingStatuss" EntitySet="ParkingStatusses" />
+          </AssociationSet>
+          <AssociationSet Name="FK_Vehicles_Persons" Association="Self.FK_Vehicles_Persons">
+            <End Role="Persons" EntitySet="Persons" />
+            <End Role="Vehicles" EntitySet="Vehicles" />
+          </AssociationSet>
+        </EntityContainer>
+      </Schema>
+    </edmx:ConceptualModels>
+    <!-- C-S mapping content -->
+    <edmx:Mappings>
+      <Mapping Space="C-S" xmlns="http://schemas.microsoft.com/ado/2009/11/mapping/cs">
+        <EntityContainerMapping StorageEntityContainer="ParkingSystemModelStoreContainer" CdmEntityContainer="ParkingSystemEntities">
+          <EntitySetMapping Name="ParkingAmounts">
+            <EntityTypeMapping TypeName="ParkingSystemModel.ParkingAmount">
+              <MappingFragment StoreEntitySet="ParkingAmounts">
+                <ScalarProperty Name="Giorno" ColumnName="Giorno" />
+                <ScalarProperty Name="IncassoTotale" ColumnName="IncassoTotale" />
+                <ScalarProperty Name="NomeParcheggio" ColumnName="NomeParcheggio" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ParkingCosts">
+            <EntityTypeMapping TypeName="ParkingSystemModel.ParkingCost">
+              <MappingFragment StoreEntitySet="ParkingCosts">
+                <ScalarProperty Name="TipoVeicolo" ColumnName="TipoVeicolo" />
+                <ScalarProperty Name="Tariffa" ColumnName="Tariffa" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ParkingHistorys">
+            <EntityTypeMapping TypeName="ParkingSystemModel.ParkingHistory">
+              <MappingFragment StoreEntitySet="ParkingHistorys">
+                <ScalarProperty Name="IDStorico" ColumnName="IDStorico" />
+                <ScalarProperty Name="Targa" ColumnName="Targa" />
+                <ScalarProperty Name="DataOrarioEntrata" ColumnName="DataOrarioEntrata" />
+                <ScalarProperty Name="DataOrarioUscita" ColumnName="DataOrarioUscita" />
+                <ScalarProperty Name="TempoTrascorso" ColumnName="TempoTrascorso" />
+                <ScalarProperty Name="Tariffa" ColumnName="Tariffa" />
+                <ScalarProperty Name="Riga" ColumnName="Riga" />
+                <ScalarProperty Name="Colonna" ColumnName="Colonna" />
+                <ScalarProperty Name="TipoVeicolo" ColumnName="TipoVeicolo" />
+                <ScalarProperty Name="NomeParcheggio" ColumnName="NomeParcheggio" />
+                <ScalarProperty Name="Propietario" ColumnName="Propietario" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Parkings">
+            <EntityTypeMapping TypeName="ParkingSystemModel.Parking">
+              <MappingFragment StoreEntitySet="Parkings">
+                <ScalarProperty Name="Righe" ColumnName="Righe" />
+                <ScalarProperty Name="Colonne" ColumnName="Colonne" />
+                <ScalarProperty Name="NomeParcheggio" ColumnName="NomeParcheggio" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="ParkingStatusses">
+            <EntityTypeMapping TypeName="ParkingSystemModel.ParkingStatuss">
+              <MappingFragment StoreEntitySet="ParkingStatuss">
+                <ScalarProperty Name="Targa" ColumnName="Targa" />
+                <ScalarProperty Name="DataOrarioEntrata" ColumnName="DataOrarioEntrata" />
+                <ScalarProperty Name="Riga" ColumnName="Riga" />
+                <ScalarProperty Name="Colonna" ColumnName="Colonna" />
+                <ScalarProperty Name="NomeParcheggio" ColumnName="NomeParcheggio" />
+                <ScalarProperty Name="TipoVeicolo" ColumnName="TipoVeicolo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Persons">
+            <EntityTypeMapping TypeName="ParkingSystemModel.Person">
+              <MappingFragment StoreEntitySet="Persons">
+                <ScalarProperty Name="Nome" ColumnName="Nome" />
+                <ScalarProperty Name="Cognome" ColumnName="Cognome" />
+                <ScalarProperty Name="DataNascita" ColumnName="DataNascita" />
+                <ScalarProperty Name="CodiceFiscale" ColumnName="CodiceFiscale" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="sysdiagrams">
+            <EntityTypeMapping TypeName="ParkingSystemModel.sysdiagram">
+              <MappingFragment StoreEntitySet="sysdiagrams">
+                <ScalarProperty Name="name" ColumnName="name" />
+                <ScalarProperty Name="principal_id" ColumnName="principal_id" />
+                <ScalarProperty Name="diagram_id" ColumnName="diagram_id" />
+                <ScalarProperty Name="version" ColumnName="version" />
+                <ScalarProperty Name="definition" ColumnName="definition" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Vehicles">
+            <EntityTypeMapping TypeName="ParkingSystemModel.Vehicle">
+              <MappingFragment StoreEntitySet="Vehicles">
+                <ScalarProperty Name="Marca" ColumnName="Marca" />
+                <ScalarProperty Name="Modello" ColumnName="Modello" />
+                <ScalarProperty Name="Targa" ColumnName="Targa" />
+                <ScalarProperty Name="Propietario" ColumnName="Propietario" />
+                <ScalarProperty Name="TipoVeicolo" ColumnName="TipoVeicolo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+        </EntityContainerMapping>
+      </Mapping>
+    </edmx:Mappings>
+  </edmx:Runtime>
+  <!-- EF Designer content (DO NOT EDIT MANUALLY BELOW HERE) -->
+  <Designer xmlns="http://schemas.microsoft.com/ado/2009/11/edmx">
+    <Connection>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="MetadataArtifactProcessing" Value="EmbedInOutputAssembly" />
+      </DesignerInfoPropertySet>
+    </Connection>
+    <Options>
+      <DesignerInfoPropertySet>
+        <DesignerProperty Name="ValidateOnBuild" Value="true" />
+        <DesignerProperty Name="EnablePluralization" Value="true" />
+        <DesignerProperty Name="IncludeForeignKeysInModel" Value="true" />
+        <DesignerProperty Name="UseLegacyProvider" Value="false" />
+        <DesignerProperty Name="CodeGenerationStrategy" Value="Nessuno" />
+      </DesignerInfoPropertySet>
+    </Options>
+    <!-- Diagram content (shape and connector positions) -->
+    <Diagrams></Diagrams>
+  </Designer>
+</edmx:Edmx>

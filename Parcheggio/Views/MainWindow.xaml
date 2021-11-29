@@ -1,0 +1,35 @@
+﻿<Window x:Class="Parcheggio.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Parcheggio.Views"
+        mc:Ignorable="d"
+        Title="{Binding NomeParcheggioScelto}" Height="537" Width="1097" Icon="/Views/Icon.ico">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        <DockPanel Grid.Row="0">
+            <Menu FontSize="19" Height="30">
+                <MenuItem Header="_Parcheggio" Height="30">
+                    <MenuItem Height="30" Header="_Ritorna al menù" Click="Ritorna_Menu" />
+                    <MenuItem Height="30" Header="_Stato Completo" Click="Stato_Completo"/>
+                </MenuItem>
+                <MenuItem Height="30" Header="_Storico">
+                    <MenuItem Height="30" Header="_Visualizza Storico" Click="Storico" />
+                </MenuItem>
+                <MenuItem Header="_Incassi" Height="30">
+                    <MenuItem Header="_Incasso Giornaliero" Height="30" Click="Incasso_Giornaliero"/>
+                    <MenuItem Header="_Incasso Storico" Height="30" Click="Incasso_Storico"/>
+                </MenuItem>
+                <MenuItem Header="Aggiorna" Click="Aggiorna" Height="30">
+                </MenuItem>
+            </Menu>
+        </DockPanel>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <Grid Name="ParcheggioView"/>
+        </ScrollViewer>
+    </Grid>
+</Window>

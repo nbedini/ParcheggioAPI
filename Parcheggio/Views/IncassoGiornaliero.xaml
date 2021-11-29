@@ -1,0 +1,52 @@
+﻿<Window x:Class="Parcheggio.Views.IncassoGiornaliero"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Parcheggio.Views"
+        mc:Ignorable="d"
+        Title="IncassoGiornaliero" MaxHeight="533.175" MaxWidth="827.725" MinHeight="533.175" MinWidth="827.725">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="4.8"></RowDefinition>
+            <RowDefinition Height="182*"></RowDefinition>
+            <RowDefinition Height="233*"></RowDefinition>
+        </Grid.RowDefinitions>
+        <DockPanel Margin="5,2.2,4.6,2.2" Grid.Row="1">
+            <!-- Datagrid -->
+            <DataGrid x:Name="Incasso_Giornaliero" AutoGenerateColumns="False" CanUserDeleteRows="False" CanUserAddRows="False" IsReadOnly="True" Height="204" VerticalAlignment="Top" Width="787">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Giorno" Width="80" Binding="{Binding Giorno}">
+
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Incasso" Width="80" Binding="{Binding IncassoTotale}">
+
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Header="Parcheggio" Width="150" Binding="{Binding NomeParcheggio}">
+
+                    </DataGridTextColumn>
+
+                </DataGrid.Columns>
+            </DataGrid>
+        </DockPanel>
+        <DockPanel Grid.Row="2" Margin="0,3.8,-0.4,-1">
+            <!-- Buttons/input gestione datagrid -->
+            <Grid Margin="10,10,10,9.6">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <Label Content="Filtra date" HorizontalAlignment="Left" Margin="10,10,0,0" FontSize="20" VerticalAlignment="Top" Width="134" RenderTransformOrigin="0.475,-0.397"/>
+                <Label  Content="Da" HorizontalAlignment="Left" Margin="0,61,0,0" FontSize="20" VerticalAlignment="Top" Width="134" RenderTransformOrigin="0.515,0.509" ></Label>
+                <DatePicker FontSize="20" FontWeight="Bold" SelectedDate="{Binding DataDa}" Margin="0,175,191.2,10"></DatePicker>
+                <Label  Content="A" HorizontalAlignment="Left" Margin="0,160,0,0" FontSize="20" VerticalAlignment="Top" Width="134" RenderTransformOrigin="0.515,0.509" ></Label>
+
+                <DatePicker FontSize="20" FontWeight="Bold" SelectedDate="{Binding DataA}" Margin="0,96,191.2,89"></DatePicker>
+
+                <Button Height="Auto" Margin="15.8,194,212.6,27" Grid.Column="1">Filtra</Button>
+            </Grid>
+
+        </DockPanel>
+    </Grid>
+</Window>
