@@ -49,8 +49,6 @@ namespace Parcheggio.Views
         public ParcheggioEsistente()
         {
             GetObtainParkingList();
-            //Thread PopolazioneComboBox = new Thread(new ThreadStart(OttenimentoParcheggiEsistenti));
-            //PopolazioneComboBox.Start();
             InitializeComponent();
             this.DataContext = this;
         }
@@ -58,15 +56,6 @@ namespace Parcheggio.Views
         #endregion
 
         #region Public Methods
-
-        //public void OttenimentoParcheggiEsistenti()
-        //{
-        //    using(ParkingSystemEntities model = new ParkingSystemEntities())
-        //    {
-        //        ListaParcheggiEsistenti = model.Parkings
-        //            .ToList();
-        //    }
-        //}
 
         public void OnPropertyChanged(string nome)
         {
@@ -81,25 +70,33 @@ namespace Parcheggio.Views
             ListaParcheggiEsistenti = data;
         }
 
+        public async Task DeleteSelectedParking()
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Delete,
+                RequestUri = new Uri("http://localhost:31329/api/remove"),
+                Content = new StringContent(JsonConvert.SerializeObject(NomeParcheggioSelezionato), Encoding.UTF8, "application/json")
+            };
+            var response = await client.SendAsync(request);
+        }
+
         #endregion
 
         #region Events
 
         private void ConfermaParcheggioClick(object sender, RoutedEventArgs e)
         {
-            //ParcheggioSelezionato = true;
-            //if(NomeParcheggioSelezionato != null)
-            //{
-            //    this.Close();
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Impossibile completare il caricamento non e' stato selezionato nessun parcheggio", "Impossibile caricare il parcheggio", MessageBoxButton.OK, MessageBoxImage.Error);
-            //    ParcheggioSelezionato = false;
-            //}
-
-            
-
+            ParcheggioSelezionato = true;
+            if (NomeParcheggioSelezionato != null)
+            {
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Impossibile completare il caricamento non e' stato selezionato nessun parcheggio", "Impossibile caricare il parcheggio", MessageBoxButton.OK, MessageBoxImage.Error);
+                ParcheggioSelezionato = false;
+            }
         }
 
         #endregion
@@ -113,12 +110,8 @@ namespace Parcheggio.Views
                 {
                     case MessageBoxResult.Yes:
                         {
-                            using(ParkingSystemEntities model = new ParkingSystemEntities())
-                            {
-                                model.Parkings.Remove(model.Parkings.FirstOrDefault(fod => fod.NomeParcheggio == NomeParcheggioSelezionato));
-                                model.SaveChanges();
-                                //OttenimentoParcheggiEsistenti();
-                            }
+                            DeleteSelectedParking();
+
                             break;
                         }
                     case MessageBoxResult.No:
