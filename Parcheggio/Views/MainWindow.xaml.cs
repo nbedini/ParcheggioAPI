@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,7 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 using Parcheggio.Models;
+using ParcheggioAPI.Models;
 
 namespace Parcheggio.Views
 {
@@ -31,7 +34,7 @@ namespace Parcheggio.Views
         public string ParcheggioEsistenteScelto { get; set; }
         public string NomeParcheggioScelto { get; set; }
 
-        Dictionary<string, string> keyValues = new Dictionary<string, string>();
+        HttpClient client = new HttpClient();
 
         #endregion
 
@@ -66,16 +69,6 @@ namespace Parcheggio.Views
 
         #region Public Methods
 
-        public List<ParkingStatuss> OttenimentoDatiDB()
-        {
-            using (ParkingSystemEntities model = new ParkingSystemEntities())
-            {
-                return model.ParkingStatusses
-                            .Where(w => w.NomeParcheggio == NomeParcheggioScelto)
-                            .ToList();
-            }
-        }
-
         public void AllButtonClick(object sender, EventArgs e)
         {
             StatoParcheggio StatoParcheggioView = new StatoParcheggio(sender, NomeParcheggioScelto);
@@ -97,258 +90,48 @@ namespace Parcheggio.Views
 
         #endregion
 
-        #region OttenimentoAutoParcheggiate(int status, string rigaeliminata, string colonnaeliminata)
-
-        public Dictionary<string, string> OttenimentoAutoParcheggiate(int status, string rigaeliminata, string colonnaeliminata)
-        {
-            var VeicoliParcheggiati = OttenimentoDatiDB();
-            string riga = "", colonna = "";
-
-            if (status == 1)
-            {
-                #region Controllo Righe e Colonne
-
-                foreach (var v in VeicoliParcheggiati)
-                {
-                    if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) >= 10)
-                    {
-                        riga = "0" + v.Riga;
-                        colonna = v.Colonna;
-                    }
-                    if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) < 10)
-                    {
-                        riga = v.Riga;
-                        colonna = "0" + v.Colonna;
-                    }
-                    if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) < 10)
-                    {
-                        riga = "0" + v.Riga;
-                        colonna = "0" + v.Colonna;
-                    }
-                    if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) >= 10)
-                    {
-                        riga = v.Riga;
-                        colonna = v.Colonna;
-                    }
-                    keyValues.Add(riga + colonna, v.Targa);
-                }
-
-                #endregion 
-
-                return keyValues;
-            }
-            else if(status == 2)
-            {
-                #region Controllo Righe e Colonne
-
-                if (Convert.ToInt32(rigaeliminata) < 10 && Convert.ToInt32(colonnaeliminata) >= 10)
-                {
-                    riga = "0" + rigaeliminata;
-                    colonna = colonnaeliminata;
-                }
-                if (Convert.ToInt32(rigaeliminata) >= 10 && Convert.ToInt32(colonnaeliminata) < 10)
-                {
-                    riga = rigaeliminata;
-                    colonna = "0" + colonnaeliminata;
-                }
-                if (Convert.ToInt32(rigaeliminata) < 10 && Convert.ToInt32(colonnaeliminata) < 10)
-                {
-                    riga = "0" + rigaeliminata;
-                    colonna = "0" + colonnaeliminata;
-                }
-                if (Convert.ToInt32(rigaeliminata) >= 10 && Convert.ToInt32(colonnaeliminata) >= 10)
-                {
-                    riga = rigaeliminata;
-                    colonna = colonnaeliminata;
-                }
-
-                #endregion
-
-                keyValues.Remove(riga + colonna);
-                return keyValues;
-            }
-            else if (status == 3)
-            {
-                #region Controllo Righe e Colonne
-
-                if (Convert.ToInt32(rigaeliminata) < 10 && Convert.ToInt32(colonnaeliminata) >= 10)
-                {
-                    riga = "0" + rigaeliminata;
-                    colonna = colonnaeliminata;
-                }
-                if (Convert.ToInt32(rigaeliminata) >= 10 && Convert.ToInt32(colonnaeliminata) < 10)
-                {
-                    riga = rigaeliminata;
-                    colonna = "0" + colonnaeliminata;
-                }
-                if (Convert.ToInt32(rigaeliminata) < 10 && Convert.ToInt32(colonnaeliminata) < 10)
-                {
-                    riga = "0" + rigaeliminata;
-                    colonna = "0" + colonnaeliminata;
-                }
-                if (Convert.ToInt32(rigaeliminata) >= 10 && Convert.ToInt32(colonnaeliminata) >= 10)
-                {
-                    riga = rigaeliminata;
-                    colonna = colonnaeliminata;
-                }
-
-                #endregion
-
-                using (ParkingSystemEntities model = new ParkingSystemEntities())
-                {
-                    if(model.ParkingStatusses.FirstOrDefault(fod => fod.Riga == rigaeliminata && fod.Colonna == colonnaeliminata) != null)
-                    {
-                        string targa = model.ParkingStatusses.FirstOrDefault(fod => fod.Riga == rigaeliminata && fod.Colonna == colonnaeliminata).Targa;
-                        keyValues.Add(riga + colonna, targa);
-                        return keyValues;
-                    }
-                    else
-                    {
-                        return keyValues;
-                    }
-                }
-            }
-            else if (status == 4)
-            {
-                keyValues = new Dictionary<string, string>();
-
-                #region Controllo Righe e Colonne
-
-                foreach (var v in VeicoliParcheggiati)
-                {
-                    if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) >= 10)
-                    {
-                        riga = "0" + v.Riga;
-                        colonna = v.Colonna;
-                    }
-                    if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) < 10)
-                    {
-                        riga = v.Riga;
-                        colonna = "0" + v.Colonna;
-                    }
-                    if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) < 10)
-                    {
-                        riga = "0" + v.Riga;
-                        colonna = "0" + v.Colonna;
-                    }
-                    if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) >= 10)
-                    {
-                        riga = v.Riga;
-                        colonna = v.Colonna;
-                    }
-                    keyValues.Add(riga + colonna, v.Targa);
-                }
-
-                #endregion
-
-                return keyValues;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        #endregion
-
         #region GenerazioneParcheggio(int status, string rigaeliminata, string colonnaeliminata)
 
-        public void GenerazioneParcheggio(int status, string rigaeliminata = "", string colonnaeliminata = "")
+        public async void GenerazioneParcheggio(int status, string rigaeliminata = "", string colonnaeliminata = "")
         {
             Grid grid = new Grid();
-            var Righe = "";
-            var Colonne = "";
 
-            #region Ottenimento righe e colonne dal database
-
-            using (ParkingSystemEntities model = new ParkingSystemEntities())
+            HttpRequestMessage request = new HttpRequestMessage
             {
-                if (ParcheggioEsistenteMenu)
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("http://localhost:31329/api/parcheggioview"),
+                Content = new StringContent(JsonConvert.SerializeObject(new DatiParcheggio
                 {
-                    Righe = model.Parkings
-                    .Where(wh => wh.NomeParcheggio == ParcheggioEsistenteScelto)
-                    .Select(s => s.Righe)
-                    .FirstOrDefault();
-
-
-                    Colonne = model.Parkings
-                        .Where(wh => wh.NomeParcheggio == ParcheggioEsistenteScelto)
-                        .Select(s => s.Colonne)
-                        .FirstOrDefault();
-                }
-                else if (ParcheggioNuovoMenu)
-                {
-                    Righe = model.Parkings
-                        .Where(wh => wh.NomeParcheggio == NomeParcheggioScelto)
-                        .Select(s => s.Righe)
-                        .FirstOrDefault();
-
-
-                    Colonne = model.Parkings
-                        .Where(wh => wh.NomeParcheggio == NomeParcheggioScelto)
-                        .Select(s => s.Colonne)
-                        .FirstOrDefault();
-                }
-            }
-
-            #endregion
-
-            List<string> rigacompleta = new List<string>();
-            List<string> colonnacompleta = new List<string>();
-            for (int i = 0; i < Convert.ToInt32(Righe); i++)
-            {
-                for (int g = 0; g < Convert.ToInt32(Colonne); g++)
-                {
-                    #region Controllo Righe e Colonne
-
-                    if (i < 10 && g >= 10)
-                    {
-                        rigacompleta.Add("0" + i.ToString());
-                        colonnacompleta.Add(g.ToString());
-                    }
-                    if (i >= 10 && g < 10)
-                    {
-                        rigacompleta.Add(i.ToString());
-                        colonnacompleta.Add("0" + g.ToString());
-                    }
-                    if (i < 10 && g < 10)
-                    {
-                        rigacompleta.Add("0" + i.ToString());
-                        colonnacompleta.Add("0" + g.ToString());
-                    }
-                    if (i >= 10 && g >= 10)
-                    {
-                        rigacompleta.Add(i.ToString());
-                        colonnacompleta.Add(g.ToString());
-                    }
-
-                    #endregion
-                }
-            }
-
-            #region Griglia di bottoni
-
-            OttenimentoAutoParcheggiate(status, rigaeliminata, colonnaeliminata);
+                    NomeParcheggio = NomeParcheggioScelto,
+                    Status = status,
+                    rigaeliminata = rigaeliminata,
+                    colonnaeliminata = colonnaeliminata,
+                    ParcheggioEsistenteMenu = this.ParcheggioEsistenteMenu,
+                    ParcheggioNuovoMenu = this.ParcheggioNuovoMenu
+                }), Encoding.UTF8, "application/json")
+            };
+            var response = await client.SendAsync(request);
+            var data = JsonConvert.DeserializeObject<ValoreRitornoParcheggioView>(await response.Content.ReadAsStringAsync());
 
             grid.Background = new SolidColorBrush(Colors.Gray);
-            for (int k = 0; k < Convert.ToInt32(Righe); k++)
+            for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
             {
                 grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
             }
-            for (int k = 0; k < Convert.ToInt32(Colonne); k++)
+            for (int k = 0; k < Convert.ToInt32(data.Colonne); k++)
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(120) });
             }
-            for (int k = 0; k < Convert.ToInt32(Righe); k++)
+            for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
             {
-                for (int j = 0; j < Convert.ToInt32(Colonne); j++)
+                for (int j = 0; j < Convert.ToInt32(data.Colonne); j++)
                 {
                     Button AreeParcheggio = new Button();
-                    AreeParcheggio.Name = "Button" + rigacompleta[k * Convert.ToInt32(Colonne)] + colonnacompleta[j];
+                    AreeParcheggio.Name = "Button" + data.rigacompleta[k * Convert.ToInt32(data.Colonne)] + data.colonnacompleta[j];
                     AreeParcheggio.Margin = new Thickness(2, 2, 0, 0);
                     AreeParcheggio.Background = new SolidColorBrush(Colors.LimeGreen);
                     AreeParcheggio.Click += new RoutedEventHandler(AllButtonClick);
-                    foreach (var v in keyValues)
+                    foreach (var v in data.keyValues)
                     {
                         if (AreeParcheggio.Name == $"Button{v.Key}")
                         {
@@ -367,8 +150,6 @@ namespace Parcheggio.Views
 
             #endregion
         }
-
-        #endregion
 
         #region menù
         private void Ritorna_Menu(object sender, RoutedEventArgs e)

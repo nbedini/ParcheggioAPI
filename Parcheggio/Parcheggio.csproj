@@ -92,6 +92,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Database.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\DatiParcheggio.cs" />
     <Compile Include="Models\Parking.cs">
       <DependentUpon>Database.tt</DependentUpon>
     </Compile>
@@ -113,6 +114,7 @@
     <Compile Include="Models\sysdiagram.cs">
       <DependentUpon>Database.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\ValoreRitornoParcheggioView.cs" />
     <Compile Include="Models\Vehicle.cs">
       <DependentUpon>Database.tt</DependentUpon>
     </Compile>

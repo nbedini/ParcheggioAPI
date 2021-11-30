@@ -5,8 +5,6 @@ VisualStudioVersion = 17.0.31912.275
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ParcheggioAPI", "ParcheggioAPI\ParcheggioAPI.csproj", "{0E97FAF0-F9B8-4FDD-A12E-A4B3E63E2C36}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FrontendASP", "FrontendASP\FrontendASP.csproj", "{8086F01D-A185-4F2C-A341-2AADE71BF917}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parcheggio", "Parcheggio\Parcheggio.csproj", "{EE8601C2-A673-42A5-810F-86BB5F146962}"
 EndProject
 Global
@@ -19,10 +17,6 @@ Global
 		{0E97FAF0-F9B8-4FDD-A12E-A4B3E63E2C36}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0E97FAF0-F9B8-4FDD-A12E-A4B3E63E2C36}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0E97FAF0-F9B8-4FDD-A12E-A4B3E63E2C36}.Release|Any CPU.Build.0 = Release|Any CPU
-		{8086F01D-A185-4F2C-A341-2AADE71BF917}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8086F01D-A185-4F2C-A341-2AADE71BF917}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8086F01D-A185-4F2C-A341-2AADE71BF917}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8086F01D-A185-4F2C-A341-2AADE71BF917}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EE8601C2-A673-42A5-810F-86BB5F146962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EE8601C2-A673-42A5-810F-86BB5F146962}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE8601C2-A673-42A5-810F-86BB5F146962}.Release|Any CPU.ActiveCfg = Release|Any CPU
