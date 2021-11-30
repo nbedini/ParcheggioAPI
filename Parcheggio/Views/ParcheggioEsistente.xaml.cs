@@ -101,7 +101,7 @@ namespace Parcheggio.Views
 
         #endregion
 
-        private void EliminaParcheggioClick(object sender, RoutedEventArgs e)
+        private async void EliminaParcheggioClick(object sender, RoutedEventArgs e)
         {
             if (NomeParcheggioSelezionato != null)
             {
@@ -110,8 +110,8 @@ namespace Parcheggio.Views
                 {
                     case MessageBoxResult.Yes:
                         {
-                            DeleteSelectedParking();
-
+                            await DeleteSelectedParking();
+                            await GetObtainParkingList();
                             break;
                         }
                     case MessageBoxResult.No:

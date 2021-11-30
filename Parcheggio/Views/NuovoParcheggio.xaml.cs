@@ -51,37 +51,15 @@ namespace Parcheggio.Views
         private void ConfermaCreaParcheggioClick(object sender, RoutedEventArgs e)
         {
 
-            //ParcheggioCreato = true;
-            //if(Righe != null && Colonne != null && NomeParcheggio != null)
-            //{
-            //    using(ParkingSystemEntities model = new ParkingSystemEntities())
-            //    {
-
-            //        List<Parking> ListaParcheggi = model.Parkings
-            //            .ToList();
-
-            //        foreach(var v in ListaParcheggi)
-            //        {
-            //            if (v.NomeParcheggio == NomeParcheggio)
-            //            {
-            //                MessageBox.Show("Impossibile creare il parcheggio perche' esiste gia' un parcheggio con lo stesso nome", "Creazione annullata", MessageBoxButton.OK, MessageBoxImage.Error);
-            //                return;
-            //            }
-            //        }
-
-            //        model.Parkings
-            //            .Add(new Parking { Colonne = Colonne, NomeParcheggio = NomeParcheggio, Righe = Righe });
-            //        model.SaveChanges();
-            //        this.Close();
-            //    }
-            //}
-            //else
-            //{
-            //    MessageBox.Show("Impossibile creare il parcheggio, non sono stati inseriti tutti i campi necessari", "Creazione Impossibile", MessageBoxButton.OK, MessageBoxImage.Error);
-            //}
-
-            PostInsertNewParking();
-
+            ParcheggioCreato = true;
+            if (Righe != null && Colonne != null && NomeParcheggio != null)
+            {
+                PostInsertNewParking();
+            }
+            else
+            {
+                MessageBox.Show("Impossibile creare il parcheggio, non sono stati inseriti tutti i campi necessari", "Creazione Impossibile", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         public async Task PostInsertNewParking()
