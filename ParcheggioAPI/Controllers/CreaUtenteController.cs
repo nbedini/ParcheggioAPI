@@ -13,8 +13,8 @@ namespace ParcheggioAPI
     [ApiController]
     public class CreaUserController : ControllerBase
     {
-        [HttpPost]
-        [Route("")]
+
+        [HttpPost("/api/Crea-Utente")]
         public ActionResult CreaUser([FromBody] User utente)
         {
 
@@ -22,12 +22,24 @@ namespace ParcheggioAPI
             {
                 if (model.Users.Select(s => new { s.Id, s.Username }).FirstOrDefault(i => i.Username == utente.Username) == null)
                 {
+
                     model.Users.Add(utente);
                     model.SaveChanges();
                     return Ok();
                 }
-                return Problem();
+                return Problem("Sto");
             }
+        }
+        [HttpGet("/api/utenti")]
+        public ActionResult GetUtenti()
+        {
+            using(ParkingSystemContext model = new ParkingSystemContext()) 
+            {
+                List<string> displayParking = model.Users.Select(s=>s.Username).ToList();
+                                                           
+                return Ok(displayParking);
+            }
+
         }
     }
 }

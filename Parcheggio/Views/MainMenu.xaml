@@ -10,5 +10,6 @@
         <Label Content="Parcheggio" HorizontalAlignment="Center" Margin="0,10,0,0" VerticalAlignment="Top" FontSize="30"/>
         <Button Click="ParcheggioNuovoClick" FontSize="20" Content="Nuovo Parcheggio" HorizontalAlignment="Left" Margin="40,82,0,0" VerticalAlignment="Top" Height="40"/>
         <Button Click="ParcheggioEsistenteClick" FontSize="20" Content="Parcheggio Esistente" HorizontalAlignment="Left" Margin="277,82,0,0" VerticalAlignment="Top" Width="234" Height="40"/>
+        <Button Content="Accedi" HorizontalAlignment="Left" Margin="18,15,0,0" VerticalAlignment="Top" Width="79" Click="AccessoClick"/>
     </Grid>
 </Window>

@@ -1,0 +1,14 @@
+﻿<Window x:Class="Parcheggio.Views.RegistrazioneLogin"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Parcheggio.Views"
+        mc:Ignorable="d"
+        Title="RegistrazioneLogin" Height="450" Width="800">
+    <Grid>
+        <Button Content="Registrazione" HorizontalAlignment="Left" Margin="100,127,0,0" VerticalAlignment="Top" Width="231" Height="139" FontSize="28" Click="RegistrazioneClick"/>
+        <Button Content="Login" HorizontalAlignment="Left" Margin="461,127,0,0" VerticalAlignment="Top" Width="235" Height="139" FontSize="28" Click="LoginClick"/>
+
+    </Grid>
+</Window>

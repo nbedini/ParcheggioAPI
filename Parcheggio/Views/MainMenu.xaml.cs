@@ -81,5 +81,11 @@ namespace Parcheggio.Views
         }
 
         #endregion
+
+        private void AccessoClick(object sender, RoutedEventArgs e)
+        {
+            RegistrazioneLogin window = new RegistrazioneLogin();
+            window.Show(); 
+        }
     }
 }
