@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Parcheggio.Views"
         mc:Ignorable="d"
-        Title="StatoCompleto" Height="450" Width="800" Icon="/Views/Icon.ico">
+        Title="StatoCompleto" Height="450" Width="800" Icon="/Views/Icon.ico" Loaded="FormLoaded">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"></RowDefinition>
@@ -49,7 +49,7 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <TextBox CharacterCasing="Upper" Text="{Binding CercareTarga}" TextChanged="TextBox_TextChanged"   MaxLength="7" Grid.Column="0" TextAlignment="Left" FontSize="15" Margin="10,76,142.2,30"/>
+                <TextBox CharacterCasing="Upper" Name="RicercaTarga" TextChanged="TextBox_TextChanged"   MaxLength="7" Grid.Column="0" TextAlignment="Left" FontSize="15" Margin="10,76,142.2,30"/>
                 <Label Content="Cerca Targa" HorizontalAlignment="Left" Margin="10,34,0,0" FontSize="20" VerticalAlignment="Top" Width="134"/>
                 <Button Grid.Column="1" Height="Auto" Content="Dettaglio Targa" FontSize="15" FontWeight="Bold" Click="Dettaglio_Click" Margin="207.8,63,21.6,10" RenderTransformOrigin="0.506,0.98"/>
                 <Button Grid.Column="1" Height="Auto" Content="Reset" FontSize="15" FontWeight="Bold" Margin="27.8,63,201.6,10" RenderTransformOrigin="0.506,0.98"/>

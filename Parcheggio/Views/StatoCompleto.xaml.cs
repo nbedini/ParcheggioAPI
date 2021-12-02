@@ -14,6 +14,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using Parcheggio.Models;
 using Microsoft.SqlServer;
+using System.Net.Http;
+using Newtonsoft.Json;
+using ParcheggioAPI.Models;
 
 namespace Parcheggio.Views
 {
@@ -25,6 +28,20 @@ namespace Parcheggio.Views
         private string ricercaTarga;
 
         public string Parcheggio { get; set; }
+
+        HttpClient client = new HttpClient();
+
+        private List<ParkingStatuss> autoparcheggiate;  
+
+        public List<ParkingStatuss> AutoParcheggiate
+        {
+            get { return autoparcheggiate; }
+            set 
+            { 
+                autoparcheggiate = value;
+                OnPropertyChanged("autoparcheggiate");
+            }
+        }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -47,12 +64,37 @@ namespace Parcheggio.Views
         {
             InitializeComponent();
             Parcheggio = nomePark;
-
-            using(ParkingSystemEntities model = new ParkingSystemEntities())
-            {
-                SC_Parcheggio.ItemsSource = model.ParkingStatusses.Where(o=>o.NomeParcheggio == Parcheggio).ToList();
-            }
             this.DataContext = this;
+        }
+
+        public async Task GetStatuss()
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("http://localhost:31329/api/statocompletogrid"),
+                Content = new StringContent(JsonConvert.SerializeObject(Parcheggio), Encoding.UTF8, "application/json")
+            };
+            var response = await client.SendAsync(request);
+            var data = JsonConvert.DeserializeObject<List<ParkingStatuss>>(await response.Content.ReadAsStringAsync());
+            AutoParcheggiate = data;
+        }
+
+        public async Task GetFilter(string targaparziale)
+        {
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("http://localhost:31329/api/statocompletoricercatarga"),
+                Content = new StringContent(JsonConvert.SerializeObject(new RicercaTarga
+                {
+                    targaparziale = targaparziale,
+                    NomeParcheggio = this.Parcheggio
+                }), Encoding.UTF8, "application/json")
+            };
+            var response = await client.SendAsync(request);
+            var data = JsonConvert.DeserializeObject<List<ParkingStatuss>>(await response.Content.ReadAsStringAsync());
+            AutoParcheggiate = data;
         }
 
         private void Dettaglio_Click(object sender, RoutedEventArgs e)
@@ -63,18 +105,22 @@ namespace Parcheggio.Views
                 MessageBox.Show("Impossibile vedere il dettaglio, nessuna riga selezionata", "Impossibile", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
-        private void Reset(object sender, RoutedEventArgs e)
+        private async void Reset(object sender, RoutedEventArgs e)
         {
-           
+            await GetStatuss();
+            SC_Parcheggio.ItemsSource = AutoParcheggiate;
         }
 
-        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        private async void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            using(ParkingSystemEntities model = new ParkingSystemEntities())
-            {
-                List<ParkingStatuss> filtro = model.ParkingStatusses.Where(o => o.Targa.Contains(CercareTarga) && o.NomeParcheggio.Equals(Parcheggio)).ToList();
-                //al momento di ricerca scompare tutto da fixare
-            }
+            await GetFilter(RicercaTarga.Text);
+            SC_Parcheggio.ItemsSource = AutoParcheggiate;
+        }
+
+        private async void FormLoaded(object sender, RoutedEventArgs e)
+        {
+            await GetStatuss();
+            SC_Parcheggio.ItemsSource = AutoParcheggiate;
         }
     }
 }
