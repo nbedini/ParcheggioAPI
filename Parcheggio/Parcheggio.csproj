@@ -225,6 +225,7 @@
     <Compile Include="Models\Person.cs">
       <DependentUpon>Database.tt</DependentUpon>
     </Compile>
+    <Compile Include="Models\RicercaTarga.cs" />
     <Compile Include="Models\sysdiagram.cs">
       <DependentUpon>Database.tt</DependentUpon>
     </Compile>

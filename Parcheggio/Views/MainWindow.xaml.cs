@@ -90,7 +90,7 @@ namespace Parcheggio.Views
 
         #endregion
 
-        #region GenerazioneParcheggio(int status, string rigaeliminata, string colonnaeliminata)
+        #region GenerazioneParcheggio usando API(int status, string rigaeliminata, string colonnaeliminata)
 
         public async void GenerazioneParcheggio(int status, string rigaeliminata = "", string colonnaeliminata = "")
         {
@@ -148,8 +148,9 @@ namespace Parcheggio.Views
             }
             ParcheggioView.Children.Add(grid);
 
-            #endregion
         }
+
+            #endregion
 
         #region menù
         private void Ritorna_Menu(object sender, RoutedEventArgs e)
