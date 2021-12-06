@@ -20,7 +20,10 @@ namespace ParcheggioAPI.Controllers
                     .FirstOrDefault(fod => fod.Riga == riga && fod.Colonna == colonna && fod.NomeParcheggio == nomeParcheggio);
                 if (veicolo != null)
                 {
-                    return Ok(veicolo.Targa);
+                    return Ok(new
+                    {
+                        Targa = veicolo.Targa
+                    });
                 }
                 else
                     return NotFound(null);
