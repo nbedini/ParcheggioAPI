@@ -12,7 +12,7 @@ namespace ParcheggioAPI.Controllers
     public class OttieniTargaController : ControllerBase
     {
         [HttpGet("/api/ottienitarga/{riga}/{colonna}/{nomeParcheggio}")]
-        public static string OttenimentoTarga(string riga, string colonna, string nomeParcheggio)
+        public ActionResult OttenimentoTarga(string riga, string colonna, string nomeParcheggio)
         {
             using (ParkingSystemContext model = new ParkingSystemContext())
             {
@@ -20,10 +20,10 @@ namespace ParcheggioAPI.Controllers
                     .FirstOrDefault(fod => fod.Riga == riga && fod.Colonna == colonna && fod.NomeParcheggio == nomeParcheggio);
                 if (veicolo != null)
                 {
-                    return veicolo.Targa;
+                    return Ok(veicolo.Targa);
                 }
                 else
-                    return null;
+                    return NotFound(null);
             }
         }
     }
