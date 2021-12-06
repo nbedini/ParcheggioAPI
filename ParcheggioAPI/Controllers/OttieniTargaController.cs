@@ -20,7 +20,7 @@ namespace ParcheggioAPI.Controllers
                     .FirstOrDefault(fod => fod.Riga == riga && fod.Colonna == colonna && fod.NomeParcheggio == nomeParcheggio);
                 if (veicolo != null)
                 {
-                    return Ok(new
+                    return Ok(new PassaggioOggettoVeicolo
                     {
                         Targa = veicolo.Targa,
                         TipoVeicolo = veicolo.TipoVeicolo
@@ -30,5 +30,11 @@ namespace ParcheggioAPI.Controllers
                     return NotFound(null);
             }
         }
+    }
+
+    public class PassaggioOggettoVeicolo
+    {
+        public string Targa { get; set; }
+        public string TipoVeicolo { get; set; }
     }
 }
