@@ -113,7 +113,7 @@ namespace Parcheggio.Views
 
         private async void TextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            await GetFilter(RicercaTarga.Text);
+            await GetFilter(CercareTarga);
             SC_Parcheggio.ItemsSource = AutoParcheggiate;
         }
 
