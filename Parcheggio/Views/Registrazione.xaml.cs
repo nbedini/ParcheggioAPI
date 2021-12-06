@@ -23,6 +23,7 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class Registrazione : Window
     {
+        public bool StatusChiusura { get; set; } = false;
         static HttpClient client = new HttpClient();
         public Registrazione()
         {
@@ -31,7 +32,6 @@ namespace Parcheggio.Views
 
         private async void SubmitClick(object sender, RoutedEventArgs e)
         {
-            //await CreaUtente();
             string username = tbUsername.Text;
             string password = tbPassword.Password;
             object candidato = new { username = username, password = password };
@@ -45,10 +45,13 @@ namespace Parcheggio.Views
             if (response.IsSuccessStatusCode)
             {
                 MessageBox.Show("Creazione utente andata a buon fine");
+                StatusChiusura = true;
+                this.Close();
             }
             else
             {
                 MessageBox.Show("Username già utilizzato");
+                StatusChiusura = false;
             }
             
         }
