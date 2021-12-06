@@ -2,6 +2,7 @@
 using Parcheggio.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -21,16 +22,38 @@ namespace Parcheggio.Views
     /// <summary>
     /// Logica di interazione per StatoParcheggio.xaml
     /// </summary>
-    public partial class StatoParcheggio : Window
+    public partial class StatoParcheggio : Window , INotifyPropertyChanged
     {
         public bool ChiusuraEsci { get; set; } = false;
         public bool Chiusura { get; set; } = false;
         public bool ChiusuraControlloTarga { get; set; } = false;
-        public string EntraEsci { get; set; }
+        private string entraesci;
+
+        public string EntraEsci
+        {
+            get { return entraesci; }
+            set 
+            { 
+                entraesci = value;
+                OnPropertyChanged("EntraEsci");
+            }
+        }
+
         public string TitoloPagina { get; set; }
         public string Targa { get; set; }
         public string TipoVeicolo { get; set; }
-        public string VeicoloConTarga { get; set; }
+        private string veicolocontarga;
+
+        public string VeicoloConTarga
+        {
+            get { return veicolocontarga; }
+            set 
+            { 
+                veicolocontarga = value;
+                OnPropertyChanged("VeicoloConTarga");
+            }
+        }
+
         public string CoordinateBottone { get; set; }
         public string RigaString { get; set; }
         public string ColonnaString { get; set; }
@@ -40,13 +63,20 @@ namespace Parcheggio.Views
 
         HttpClient client = new HttpClient();
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public StatoParcheggio(object sender, string nomeparcheggio)
         {
             ParcheggioSelezionato = nomeparcheggio;
             CoordinateBottone = ((Button)sender).Name.Substring(6);
-            CompilazionePagina();
             InitializeComponent();
+            CompilazionePagina();
             this.DataContext = this;
+        }
+
+        public void OnPropertyChanged(string propertyname)
+        {
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyname));
         }
 
         public async void CompilazionePagina()
@@ -80,15 +110,18 @@ namespace Parcheggio.Views
             HttpRequestMessage request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"http://localhost:31329/api/ottienitarga/{RigaString}/{ColonnaString}/{ParcheggioSelezionato}"),
+                RequestUri = new Uri($"http://localhost:31329/api/ottienitarga/{RigaString}/{ColonnaString}/{ParcheggioSelezionato}")                
             };
             var response = await client.SendAsync(request);
-            Targa = JsonConvert.DeserializeObject<string>(await response.Content.ReadAsStringAsync());
+            var data = JsonConvert.DeserializeObject<PassaggioOggettoVeicolo>(await response.Content.ReadAsStringAsync());
 
-            if (Targa != null)
+            if (data != null)
             {
-                VeicoloConTarga = $"{TipoVeicolo} con targa {Targa.ToUpper()}";
-                EntraEsci = "Esci";
+                if (data.Targa != null)
+                {
+                    VeicoloConTarga = $"{data.TipoVeicolo} con targa {data.Targa.ToUpper()}";
+                    EntraEsci = "Esci";
+                }
             }
             else
             {
@@ -124,11 +157,12 @@ namespace Parcheggio.Views
                            Riga = RigaString,
                            Colonna = ColonnaString,
                            NomeParcheggio = ParcheggioSelezionato
-                        }))
+                        }), Encoding.UTF8, "application/json")
                     };
                     var response = await client.SendAsync(request);
-                    var data = JsonConvert.DeserializeObject<TimeSpan>(await response.Content.ReadAsStringAsync());
-                    MessageBox.Show($"Tempo trascorso: {data.ToString().Substring(0, data.ToString().IndexOf("."))}", "Tempo trascorso", MessageBoxButton.OK, MessageBoxImage.None);
+                    var data = await response.Content.ReadAsStringAsync();
+                    var time = TimeSpan.Parse(data);
+                    MessageBox.Show($"Tempo trascorso: {time.Days}:{time.Hours}:{time.Minutes}:{time.Seconds}", "Tempo trascorso", MessageBoxButton.OK, MessageBoxImage.None);
                     ChiusuraEsci = true;
                     this.Close();
                 }

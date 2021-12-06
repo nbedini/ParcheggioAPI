@@ -37,8 +37,8 @@ namespace ParcheggioAPI.Controllers
                         )
                     };
 
-                    SecurityToken token = TokenHandler.CreateToken(TokenDescriptor);
-                    return Ok(TokenHandler.WriteToken(token));
+                    SecurityToken token = TokenHandler.CreateToken(TokenDescriptor); 
+                    return Ok(TokenHandler.WriteToken(token).ToString());
                 }
                 else
                 {
@@ -60,6 +60,22 @@ namespace ParcheggioAPI.Controllers
                 else
                     return Ok("Logout effettuato con successo");
             }    
+        }
+        
+        [Authorize]
+        [HttpGet("/api/Admin")]
+        public ActionResult IsAdmin()
+        {
+            var username = HttpContext.User.Claims.FirstOrDefault(fod => fod.Type == "Username").Value;
+            var id = Convert.ToInt32(HttpContext.User.Claims.FirstOrDefault(fod => fod.Type == "Id").Value);
+            using (ParkingSystemContext model = new ParkingSystemContext())
+            {
+                var candidate = model.Users.FirstOrDefault(fod => fod.Id == id && fod.Username == username);
+                if (candidate == null) return NotFound("Errore");
+                else
+                    if(candidate.Username == "Admin" && candidate.Password == "Admin") return Ok(true);
+                    return Ok(false);
+            }
         }
     }
 }
