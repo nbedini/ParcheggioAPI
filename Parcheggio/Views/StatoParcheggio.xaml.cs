@@ -161,7 +161,8 @@ namespace Parcheggio.Views
                     };
                     var response = await client.SendAsync(request);
                     var data = await response.Content.ReadAsStringAsync();
-                    MessageBox.Show($"Tempo trascorso: {data.Substring(0, data.IndexOf("."))}", "Tempo trascorso", MessageBoxButton.OK, MessageBoxImage.None);
+                    var time = TimeSpan.Parse(data);
+                    MessageBox.Show($"Tempo trascorso: {time.Days}:{time.Hours}:{time.Minutes}:{time.Seconds}", "Tempo trascorso", MessageBoxButton.OK, MessageBoxImage.None);
                     ChiusuraEsci = true;
                     this.Close();
                 }
