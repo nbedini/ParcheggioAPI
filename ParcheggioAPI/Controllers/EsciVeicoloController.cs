@@ -32,7 +32,6 @@ namespace ParcheggioAPI.Controllers
                 {
                     NomeParcheggio = o.NomeParcheggio,
                     TipoVeicolo = Veicolo.TipoVeicolo,
-                    TempoTrascorso = TempoTrascorso,
                     Colonna = o.Colonna,
                     Riga = o.Riga,
                     DataOrarioEntrata = OrarioIngresso,
@@ -57,12 +56,12 @@ namespace ParcheggioAPI.Controllers
                 model.SaveChanges();
 
                 //se trovo già un incasso nel giorno odierno aggiorno senò isnerisco nuovo incasso
-                if (model.ParkingAmounts.Where(w => w.NomeParcheggio == o.NomeParcheggio).Count() > 0)
+                if (model.ParkingAmounts.Where(w => w.NomeParcheggio == o.NomeParcheggio && OrarioUscita.Date == w.Giorno.Date).Count() > 0)
                 {
                     var giorno = TimeSpan.FromDays(1) - TimeSpan.FromMilliseconds(1);
-                    var candidate = model.ParkingAmounts.FirstOrDefault(fod => fod.NomeParcheggio == o.NomeParcheggio);
+                    var candidate = model.ParkingAmounts.FirstOrDefault(fod => fod.NomeParcheggio == o.NomeParcheggio && OrarioUscita.Date == fod.Giorno.Date);
                     candidate.IncassoTotale = model.ParkingHistorys
-                        .Where(w => w.NomeParcheggio == o.NomeParcheggio && w.TempoTrascorso < giorno)
+                        .Where(w => w.NomeParcheggio == o.NomeParcheggio)
                         .Sum(s => s.Tariffa)
                         .ToString();
 
@@ -75,7 +74,7 @@ namespace ParcheggioAPI.Controllers
                     {
                         NomeParcheggio = o.NomeParcheggio,
                         IncassoTotale = model.ParkingHistorys
-                            .Where(w => w.NomeParcheggio == o.NomeParcheggio && w.TempoTrascorso < giorno)
+                            .Where(w => w.NomeParcheggio == o.NomeParcheggio && w.DataOrarioUscita.Date == OrarioUscita.Date)
                             .Sum(s => s.Tariffa)
                             .ToString(),
                         Giorno = DateTime.Today
