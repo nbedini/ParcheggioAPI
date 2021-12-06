@@ -83,8 +83,8 @@ namespace ParcheggioAPI.Controllers
 
                     model.SaveChanges();
                 }
-
-                return Ok(TempoTrascorso);
+                var tempo = new { Tt = TempoTrascorso };
+                return Ok(tempo);
             }
         }
 
