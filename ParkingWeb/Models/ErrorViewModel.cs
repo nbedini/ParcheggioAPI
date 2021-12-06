@@ -1,6 +1,6 @@
 using System;
 
-namespace ParcheggioWeb.Models
+namespace ParkingWeb.Models
 {
     public class ErrorViewModel
     {

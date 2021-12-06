@@ -1,0 +1,57 @@
+﻿@model ParkingWeb.Models.Proprietario_Macchine
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Proprietario</h1>
+
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Persona.Nome)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Persona.Nome)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Persona.Cognome)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Persona.Cognome)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Persona.DataNascita)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Persona.DataNascita)
+        </dd>
+    </dl>
+</div>
+
+<div>
+    <h4>Veicoli</h4>
+    <hr />
+    <table class="table table-bordered table-responsive table-hover">
+        <tr>
+            <th>Targa</th>
+            <th>Marca</th>
+            <th>Modello</th>
+            <th>Tipo Veicolo</th>
+        </tr>
+        @foreach (var d in Model.Veicoli)
+        {
+            <tr>
+                <td>@d.Targa</td>
+                <td>@d.Marca</td>
+                <td>@d.Modello</td>
+                <td>@d.TipoVeicolo</td>              
+            </tr>
+        }
+    </table>
+</div>
+
+
+<div>
+</div>
