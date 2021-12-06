@@ -19,6 +19,7 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class RegistrazioneLogin : Window
     {
+        public bool AdminONo { get; set; }
         public RegistrazioneLogin()
         {
             InitializeComponent();
@@ -27,15 +28,17 @@ namespace Parcheggio.Views
         private void RegistrazioneClick(object sender, RoutedEventArgs e)
         {
             Registrazione r = new Registrazione();
-            r.Show();
-            this.Hide();
+            r.ShowDialog();
+            AdminONo = r.StatusChiusura;
+            this.Close();
         }
 
         private void LoginClick(object sender, RoutedEventArgs e)
         {
             Login l = new Login();
-            l.Show();
-            this.Hide();
+            l.ShowDialog();
+            AdminONo = l.Risposta;
+            this.Close();
         }
     }
 }

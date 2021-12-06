@@ -21,6 +21,8 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class Login : Window
     {
+
+        public bool Risposta { get; set; }
         static HttpClient client = new HttpClient();
         public Login()
         {
@@ -52,9 +54,8 @@ namespace Parcheggio.Views
                 };
                 var response2 = await client.SendAsync(request2);
                 var risposta = await response2.Content.ReadAsStringAsync();
-                MainMenu window = new MainMenu(risposta);
-                this.Hide();
-                window.Show();
+                Risposta = Boolean.Parse(risposta);
+                this.Close();
             }
             else
             {

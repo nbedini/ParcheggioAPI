@@ -36,12 +36,14 @@ namespace Parcheggio.Views
         #endregion
 
         #region Constructor
-        public MainMenu(string admin)
+        public MainMenu(bool admin)
         {
             InitializeComponent();
+            if(!admin) 
+                btNuovo.Visibility = System.Windows.Visibility.Collapsed;
+            else 
+                btNuovo.Visibility = System.Windows.Visibility.Visible;
             this.DataContext = this;
-            if(admin == "false") btNuovo.Visibility = System.Windows.Visibility.Collapsed;
-            else btNuovo.Visibility = System.Windows.Visibility.Visible;
         }
 
 
@@ -52,7 +54,6 @@ namespace Parcheggio.Views
         private void ParcheggioNuovoClick(object sender, RoutedEventArgs e)
         {
             ParcheggioNuovo = true;
-            this.Hide();
             NuovoParcheggio NuovoParcheggioView = new NuovoParcheggio();
             NuovoParcheggioView.ShowDialog();
             NomeParcheggioCreato = NuovoParcheggioView.NomeParcheggio;
@@ -69,8 +70,6 @@ namespace Parcheggio.Views
         private async void ParcheggioEsistenteClick(object sender, RoutedEventArgs e)
         {
             ParcheggioEsistenteProp = true;
-            this.Hide();
-            //ParcheggioEsistente ParcheggioEsistenteView = new ParcheggioEsistente();
             client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Properties.Settings.Token);
             var request = new HttpRequestMessage
             {

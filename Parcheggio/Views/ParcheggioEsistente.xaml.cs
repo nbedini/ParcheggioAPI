@@ -92,7 +92,7 @@ namespace Parcheggio.Views
             ParcheggioSelezionato = true;
             if (NomeParcheggioSelezionato != null)
             {
-                this.Close();
+                this.Close();                
             }
             else
             {
