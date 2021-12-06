@@ -12,7 +12,7 @@ namespace ParcheggioAPI.Controllers
     public class EsciVeicoloController : ControllerBase
     {
         [HttpDelete("/api/esciveicolo")]
-        protected ActionResult EsciVeicolo([FromBody] OggettoEsciVeicolo o)
+        public ActionResult EsciVeicolo([FromBody] OggettoEsciVeicolo o)
         {
             Vehicle Veicolo = MetodiSupporto.OttieniVeicolo(MetodiSupporto.OttenimentoTarga(o.Riga, o.Colonna, o.NomeParcheggio));           
 
@@ -83,8 +83,8 @@ namespace ParcheggioAPI.Controllers
 
                     model.SaveChanges();
                 }
-
-                return Ok(TempoTrascorso);
+                var tempo = new { Tt = TempoTrascorso };
+                return Ok(tempo);
             }
         }
 
