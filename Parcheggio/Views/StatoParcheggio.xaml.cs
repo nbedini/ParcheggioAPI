@@ -115,10 +115,13 @@ namespace Parcheggio.Views
             var response = await client.SendAsync(request);
             var data = JsonConvert.DeserializeObject<PassaggioOggettoVeicolo>(await response.Content.ReadAsStringAsync());
 
-            if (data.Targa != null)
+            if (data != null)
             {
-                VeicoloConTarga = $"{data.TipoVeicolo} con targa {data.Targa.ToUpper()}";
-                EntraEsci = "Esci";
+                if (data.Targa != null)
+                {
+                    VeicoloConTarga = $"{data.TipoVeicolo} con targa {data.Targa.ToUpper()}";
+                    EntraEsci = "Esci";
+                }
             }
             else
             {
@@ -157,8 +160,8 @@ namespace Parcheggio.Views
                         }), Encoding.UTF8, "application/json")
                     };
                     var response = await client.SendAsync(request);
-                    var data = JsonConvert.DeserializeObject<TimeSpan>(await response.Content.ReadAsStringAsync());
-                    MessageBox.Show($"Tempo trascorso: {data.ToString().Substring(0, data.ToString().IndexOf("."))}", "Tempo trascorso", MessageBoxButton.OK, MessageBoxImage.None);
+                    var data = await response.Content.ReadAsStringAsync();
+                    MessageBox.Show($"Tempo trascorso: {data.Substring(0, data.IndexOf("."))}", "Tempo trascorso", MessageBoxButton.OK, MessageBoxImage.None);
                     ChiusuraEsci = true;
                     this.Close();
                 }
