@@ -14,8 +14,7 @@ namespace ParcheggioAPI.Controllers
         [HttpDelete("/api/esciveicolo")]
         protected ActionResult EsciVeicolo([FromBody] OggettoEsciVeicolo o)
         {
-            if (o.Veicolo == null) return Problem("Veicolo passato non valido");
-            if (o.Veicolo.Targa.Length == 0 || o.Veicolo.Propietario.Length == 0 || o.Veicolo.Targa == null || o.Veicolo.Propietario == null) return Problem("Veicolo passato non valido!");
+            Vehicle Veicolo = MetodiSupporto.OttieniVeicolo(MetodiSupporto.OttenimentoTarga(o.Riga, o.Colonna, o.NomeParcheggio));           
 
             DateTime OrarioUscita, OrarioIngresso = new DateTime(); //prendo la data e orario corrente 
             OrarioUscita = DateTime.Now;
@@ -24,7 +23,7 @@ namespace ParcheggioAPI.Controllers
             {
                 //prendo l'orario d'ingresso del veicolo che sta uscendo così calcolo il tempo trascorso
                 OrarioIngresso = model.ParkingStatusses
-                   .FirstOrDefault(fod => fod.Targa == o.Veicolo.Targa).DataOrarioEntrata;
+                   .FirstOrDefault(fod => fod.Targa == Veicolo.Targa).DataOrarioEntrata;
 
                 TimeSpan TempoTrascorso = OrarioUscita - OrarioIngresso;
 
@@ -32,7 +31,7 @@ namespace ParcheggioAPI.Controllers
                 model.ParkingHistorys.Add(new ParkingHistory
                 {
                     NomeParcheggio = o.NomeParcheggio,
-                    TipoVeicolo = o.Veicolo.TipoVeicolo,
+                    TipoVeicolo = Veicolo.TipoVeicolo,
                     TempoTrascorso = TempoTrascorso,
                     Colonna = o.Colonna,
                     Riga = o.Riga,
@@ -40,10 +39,10 @@ namespace ParcheggioAPI.Controllers
                     DataOrarioUscita = OrarioUscita,
 
                     Propietario = model.Vehicles
-                       .FirstOrDefault(fod => fod.Targa == o.Veicolo.Targa).Propietario,
-                    Targa = o.Veicolo.Targa,
+                       .FirstOrDefault(fod => fod.Targa == Veicolo.Targa).Propietario,
+                    Targa = Veicolo.Targa,
                     Tariffa = model.ParkingCosts
-                       .FirstOrDefault(fod => fod.TipoVeicolo == o.Veicolo.TipoVeicolo).Tariffa
+                       .FirstOrDefault(fod => fod.TipoVeicolo == Veicolo.TipoVeicolo).Tariffa
                 });
 
                 //salvo
@@ -52,7 +51,7 @@ namespace ParcheggioAPI.Controllers
                 //rimuovo da stato parcheggio
                 model.ParkingStatusses
                    .Remove(model.ParkingStatusses
-                   .FirstOrDefault(fod => fod.Targa == o.Veicolo.Targa && fod.Riga == o.Riga && fod.Colonna == o.Colonna));
+                   .FirstOrDefault(fod => fod.Targa == Veicolo.Targa && fod.Riga == o.Riga && fod.Colonna == o.Colonna));
 
 
                 model.SaveChanges();
@@ -93,7 +92,6 @@ namespace ParcheggioAPI.Controllers
 
     public class OggettoEsciVeicolo
     {
-        public Vehicle Veicolo { get; set; }
         public string NomeParcheggio { get; set; }
         public string Colonna { get; set; }
         public string Riga { get; set; }
