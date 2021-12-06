@@ -42,7 +42,7 @@ namespace Parcheggio.Views
 
         public MainWindow()
         {
-            MainMenu MenuView = new MainMenu();
+            MainMenu MenuView = new MainMenu("True");
             MenuView.ShowDialog();
             ParcheggioEsistenteScelto = MenuView.ParcheggioScelto;
             ParcheggioEsistenteMenu = MenuView.ParcheggioEsistenteProp;

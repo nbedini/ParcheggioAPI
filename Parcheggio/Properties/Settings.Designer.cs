@@ -18,9 +18,12 @@ namespace Parcheggio.Properties {
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
         
         public static Settings Default {
+            
             get {
                 return defaultInstance;
             }
         }
+        public static string Token
+        { get; set; }
     }
 }

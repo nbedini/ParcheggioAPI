@@ -1,7 +1,9 @@
-﻿using Parcheggio.Models;
+﻿using Microsoft.AspNetCore.Authorization;
+using Parcheggio.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -21,7 +23,7 @@ namespace Parcheggio.Views
     public partial class MainMenu : Window
     {
         #region Properties
-
+        static HttpClient client = new HttpClient();
         public bool ParcheggioEsistenteProp { get; set; } = false;
         public bool ParcheggioNuovo { get; set; } = false;
         public bool ParcheggioEsistenteSelezionato { get; set; } = false;
@@ -29,16 +31,17 @@ namespace Parcheggio.Views
         public string NomeParcheggioCreato { get; set; }
         public string ParcheggioScelto { get; set; }
 
-        ParcheggioEsistente ParcheggioEsistenteView = new ParcheggioEsistente();
+
 
         #endregion
 
         #region Constructor
-
-        public MainMenu()
+        public MainMenu(string admin)
         {
             InitializeComponent();
             this.DataContext = this;
+            if(admin == "false") btNuovo.Visibility = System.Windows.Visibility.Collapsed;
+            else btNuovo.Visibility = System.Windows.Visibility.Visible;
         }
 
 
@@ -63,11 +66,21 @@ namespace Parcheggio.Views
             }
         }
 
-        private void ParcheggioEsistenteClick(object sender, RoutedEventArgs e)
+        private async void ParcheggioEsistenteClick(object sender, RoutedEventArgs e)
         {
             ParcheggioEsistenteProp = true;
             this.Hide();
             //ParcheggioEsistente ParcheggioEsistenteView = new ParcheggioEsistente();
+            client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Properties.Settings.Token);
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri("http://localhost:31329/api/Admin"),
+
+            };
+            var response = await client.SendAsync(request);
+            var risposta = await response.Content.ReadAsStringAsync();
+            ParcheggioEsistente ParcheggioEsistenteView = new ParcheggioEsistente(risposta);
             ParcheggioEsistenteView.ShowDialog();
             ParcheggioScelto = ParcheggioEsistenteView.NomeParcheggioSelezionato;
             ParcheggioEsistenteSelezionato = ParcheggioEsistenteView.ParcheggioSelezionato;
@@ -86,6 +99,36 @@ namespace Parcheggio.Views
         {
             RegistrazioneLogin window = new RegistrazioneLogin();
             window.Show(); 
+        }
+
+        private async void LogoutClick(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Sicuro di voler eseguire il logout ? " , "Conferma logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    {
+                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Properties.Settings.Token);
+                        var request = new HttpRequestMessage
+                        {
+                            Method = HttpMethod.Post,
+                            RequestUri = new Uri("http://localhost:31329/api/Logout"),
+
+                        };
+                        var response = await client.SendAsync(request);
+                        var risposta = await response.Content.ReadAsStringAsync();
+                        this.Close();
+                        RegistrazioneLogin RegistrazioneLogin = new RegistrazioneLogin();
+                        RegistrazioneLogin.ShowDialog();
+                        Properties.Settings.Token = "";
+                        
+                        break;
+                    }
+                case MessageBoxResult.No:
+                    {
+                        break;
+                    }
+            }
         }
     }
 }
