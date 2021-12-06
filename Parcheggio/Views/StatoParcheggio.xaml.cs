@@ -1,7 +1,10 @@
-﻿using Parcheggio.Models;
+﻿using Newtonsoft.Json;
+using Parcheggio.Models;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -19,34 +22,64 @@ namespace Parcheggio.Views
     /// <summary>
     /// Logica di interazione per StatoParcheggio.xaml
     /// </summary>
-    public partial class StatoParcheggio : Window
+    public partial class StatoParcheggio : Window , INotifyPropertyChanged
     {
         public bool ChiusuraEsci { get; set; } = false;
         public bool Chiusura { get; set; } = false;
         public bool ChiusuraControlloTarga { get; set; } = false;
-        public string EntraEsci { get; set; }
+        private string entraesci;
+
+        public string EntraEsci
+        {
+            get { return entraesci; }
+            set 
+            { 
+                entraesci = value;
+                OnPropertyChanged("EntraEsci");
+            }
+        }
+
         public string TitoloPagina { get; set; }
         public string Targa { get; set; }
         public string TipoVeicolo { get; set; }
-        public string VeicoloConTarga { get; set; }
+        private string veicolocontarga;
+
+        public string VeicoloConTarga
+        {
+            get { return veicolocontarga; }
+            set 
+            { 
+                veicolocontarga = value;
+                OnPropertyChanged("VeicoloConTarga");
+            }
+        }
+
         public string CoordinateBottone { get; set; }
         public string RigaString { get; set; }
         public string ColonnaString { get; set; }
         public int Riga { get; set; }
         public int Colonna { get; set; }
         public string ParcheggioSelezionato { get; set; }
+
+        HttpClient client = new HttpClient();
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
         public StatoParcheggio(object sender, string nomeparcheggio)
         {
             ParcheggioSelezionato = nomeparcheggio;
             CoordinateBottone = ((Button)sender).Name.Substring(6);
-            Thread OttenimentoTargaThread = new Thread(new ThreadStart(OttenimentoTarga));
-            OttenimentoTargaThread.Start();
-            CompilazionePagina(OttenimentoTargaThread);
             InitializeComponent();
+            CompilazionePagina();
             this.DataContext = this;
         }
 
-        public void CompilazionePagina(Thread thread)
+        public void OnPropertyChanged(string propertyname)
+        {
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyname));
+        }
+
+        public async void CompilazionePagina()
         {
             if (CoordinateBottone.Substring(0, 1) == "0" && CoordinateBottone.Substring(2, 1) == "0")
             {
@@ -74,12 +107,21 @@ namespace Parcheggio.Views
 
             TitoloPagina = $"Parcheggio alla riga {Riga + 1} e colonna {Colonna + 1}";
 
-            thread.Join();
-
-            if(Targa != null)
+            HttpRequestMessage request = new HttpRequestMessage
             {
-                VeicoloConTarga = $"{TipoVeicolo} con targa {Targa.ToUpper()}";
-                EntraEsci = "Esci";
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://localhost:31329/api/ottienitarga/{RigaString}/{ColonnaString}/{ParcheggioSelezionato}")                
+            };
+            var response = await client.SendAsync(request);
+            var data = JsonConvert.DeserializeObject<PassaggioOggettoVeicolo>(await response.Content.ReadAsStringAsync());
+
+            if (data != null)
+            {
+                if (data.Targa != null)
+                {
+                    VeicoloConTarga = $"{data.TipoVeicolo} con targa {data.Targa.ToUpper()}";
+                    EntraEsci = "Esci";
+                }
             }
             else
             {
@@ -87,84 +129,8 @@ namespace Parcheggio.Views
                 EntraEsci = "Entra";
             }
         }
-
-        public void OttenimentoTarga()
-        {
-            using(ParkingSystemEntities model = new ParkingSystemEntities())
-            {
-                ParkingStatuss veicolo = model.ParkingStatusses
-                    .FirstOrDefault(fod => fod.Riga == this.RigaString && fod.Colonna == this.ColonnaString);
-                if( veicolo != null)
-                {
-                    Targa = veicolo.Targa;
-                    TipoVeicolo = veicolo.TipoVeicolo;
-                }
-            }
-        }
-
-        public TimeSpan Esci()
-        {
-            DateTime OrarioUscita, OrarioIngresso = new DateTime();
-            OrarioUscita = DateTime.Now;
-
-            using (ParkingSystemEntities model = new ParkingSystemEntities())
-            {
-                OrarioIngresso = model.ParkingStatusses
-                    .FirstOrDefault(fod => fod.Targa == this.Targa).DataOrarioEntrata;
-                TimeSpan TempoTrascorso = OrarioUscita - OrarioIngresso;
-
-                model.ParkingHistorys.Add(new ParkingHistory
-                {
-                    NomeParcheggio = this.ParcheggioSelezionato,
-                    TipoVeicolo = this.TipoVeicolo,
-                    TempoTrascorso = TempoTrascorso,
-                    Colonna = this.ColonnaString,
-                    Riga = this.RigaString,
-                    DataOrarioEntrata = OrarioIngresso,
-                    DataOrarioUscita = OrarioUscita,
-                    Propietario = model.Vehicles
-                        .FirstOrDefault(fod => fod.Targa == this.Targa).Propietario,
-                    Targa = this.Targa,
-                    Tariffa = model.ParkingCosts
-                        .FirstOrDefault(fod => fod.TipoVeicolo == this.TipoVeicolo).Tariffa
-                });
-                model.SaveChanges();
-
-                model.ParkingStatusses
-                    .Remove(model.ParkingStatusses
-                    .FirstOrDefault(fod => fod.Targa == this.Targa && fod.Riga == this.RigaString && fod.Colonna == this.ColonnaString));
-                model.SaveChanges();
-
-                if (model.ParkingAmounts.Where(w => w.NomeParcheggio == this.ParcheggioSelezionato).Count() > 0)
-                {
-                    var giorno = TimeSpan.FromDays(1) - TimeSpan.FromMilliseconds(1);
-                    var candidate = model.ParkingAmounts.FirstOrDefault(fod => fod.NomeParcheggio == this.ParcheggioSelezionato);
-                    candidate.IncassoTotale = model.ParkingHistorys
-                        .Where(w => w.NomeParcheggio == this.ParcheggioSelezionato && w.TempoTrascorso < giorno)
-                        .Sum(s => s.Tariffa)
-                        .ToString();
-                    model.SaveChanges();
-                }
-                else
-                {
-                    var giorno = TimeSpan.FromDays(1) - TimeSpan.FromMilliseconds(1);
-                    model.ParkingAmounts.Add(new ParkingAmount
-                    {
-                        NomeParcheggio = this.ParcheggioSelezionato,
-                        IncassoTotale = model.ParkingHistorys
-                            .Where(w => w.NomeParcheggio == this.ParcheggioSelezionato && w.TempoTrascorso < giorno)
-                            .Sum(s => s.Tariffa)
-                            .ToString(),
-                        Giorno = DateTime.Today
-                    });
-                    model.SaveChanges();
-                }
-
-                return TempoTrascorso;
-            }
-        }
-
-        private void ConfermaClick(object sender, RoutedEventArgs e)
+        
+        private async void ConfermaClick(object sender, RoutedEventArgs e)
         {
             if(((Button)sender).Content.ToString() == "Entra")
             {
@@ -182,8 +148,21 @@ namespace Parcheggio.Views
                 MessageBoxResult dialogResult = MessageBox.Show("Sei sicuro di voler uscire?", "Uscita parcheggio", MessageBoxButton.YesNo, MessageBoxImage.Question);
                 if (dialogResult == MessageBoxResult.Yes)
                 {
-                    TimeSpan TempoParcheggiato = Esci();
-                    MessageBox.Show($"Tempo trascorso: {TempoParcheggiato.ToString().Substring(0, TempoParcheggiato.ToString().IndexOf("."))}", "Tempo trascorso", MessageBoxButton.OK, MessageBoxImage.None);
+                    HttpRequestMessage request = new HttpRequestMessage
+                    {
+                        Method = HttpMethod.Delete,
+                        RequestUri = new Uri("http://localhost:31329/api/esciveicolo"),
+                        Content = new StringContent(JsonConvert.SerializeObject(new OggettoEsciVeicolo
+                        {
+                           Riga = RigaString,
+                           Colonna = ColonnaString,
+                           NomeParcheggio = ParcheggioSelezionato
+                        }), Encoding.UTF8, "application/json")
+                    };
+                    var response = await client.SendAsync(request);
+                    var data = await response.Content.ReadAsStringAsync();
+                    var time = TimeSpan.Parse(data);
+                    MessageBox.Show($"Tempo trascorso: {time.Days}:{time.Hours}:{time.Minutes}:{time.Seconds}", "Tempo trascorso", MessageBoxButton.OK, MessageBoxImage.None);
                     ChiusuraEsci = true;
                     this.Close();
                 }

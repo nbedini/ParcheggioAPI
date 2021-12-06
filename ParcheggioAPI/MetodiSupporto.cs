@@ -162,5 +162,35 @@ namespace ParcheggioAPI
                 }
             }
         }
+
+        public static Vehicle OttieniVeicolo(string targa)
+        {
+            using (ParkingSystemContext model = new ParkingSystemContext())
+            {
+                Vehicle veicolo = model.Vehicles
+                    .FirstOrDefault(o=>o.Targa==targa);
+                if (veicolo != null)
+                {
+                    return veicolo;
+                }
+                else
+                    return null;
+            }
+        }
+
+        public static string OttenimentoTarga(string riga,string colonna,string nomeParcheggio)
+        {
+            using (ParkingSystemContext model = new ParkingSystemContext())
+            {
+                ParkingStatuss veicolo = model.ParkingStatusses
+                    .FirstOrDefault(fod => fod.Riga == riga && fod.Colonna == colonna && fod.NomeParcheggio == nomeParcheggio);
+                if (veicolo != null)
+                {
+                    return veicolo.Targa;
+                }
+                else
+                    return null;
+            }
+        }
     }
 }
