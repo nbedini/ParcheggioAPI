@@ -14,10 +14,11 @@ namespace ParcheggioAPI.Controllers
     [ApiController]
     public class LoginLogoutController : ControllerBase
     {
+        public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         [HttpPost("/api/Login")]
         public ActionResult Login([FromBody] User usercredentials)
         {
-            using(ParkingSystemContext model = new ParkingSystemContext())
+            using (ParkingSystemContext model = new ParkingSystemContext())
             {
                 if(usercredentials.Password != null && usercredentials.Username != null)
                 {
@@ -38,7 +39,8 @@ namespace ParcheggioAPI.Controllers
                         )
                     };
 
-                    SecurityToken token = TokenHandler.CreateToken(TokenDescriptor); 
+                    SecurityToken token = TokenHandler.CreateToken(TokenDescriptor);
+                    logger.Log(LogLevel.Info, "Login utente con username {User}.", usercredentials.Username);
                     return Ok(TokenHandler.WriteToken(token).ToString());
                 }
                 else
@@ -57,8 +59,9 @@ namespace ParcheggioAPI.Controllers
             using (ParkingSystemContext model = new ParkingSystemContext())
             {
                 var candidate = model.Users.FirstOrDefault(fod => fod.Id == id && fod.Username == username);
-                if (candidate == null) return NotFound("Impossibile effettuare il logout token non valido");
+                if (candidate == null) return NotFound("Impossibile effettuare il logout, token non valido");
                 else
+                    logger.Log(LogLevel.Info, "Logout utente con username {User}.", candidate.Username);
                     return Ok("Logout effettuato con successo");
             }    
         }

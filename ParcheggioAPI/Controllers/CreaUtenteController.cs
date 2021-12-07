@@ -14,7 +14,7 @@ namespace ParcheggioAPI
     [ApiController]
     public class CreaUserController : ControllerBase
     {
-
+        public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         [HttpPost("/api/Crea-Utente")]
         public ActionResult CreaUser([FromBody] User utente)
         {
@@ -23,12 +23,13 @@ namespace ParcheggioAPI
             {
                 if (model.Users.Select(s => new { s.Id, s.Username }).FirstOrDefault(i => i.Username == utente.Username) == null)
                 {
-                    Logger logger = LogManager.GetCurrentClassLogger();
-                    logger.Log(LogLevel.Debug, "Creazione utente con username {User} alla data {oggi}",utente.Username,DateTime.UtcNow);
+                    logger.Log(LogLevel.Info, "Creazione utente con username {User}.",utente.Username);
+                    string a = logger.Name;
                     model.Users.Add(utente);
                     model.SaveChanges();
-                    return Ok();
+                    return Ok(a);
                 }
+                logger.Log(LogLevel.Fatal, "Tentata creazione utente con username {User} già utilizzato.", utente.Username);
                 return Problem();
             }
         }
@@ -37,8 +38,7 @@ namespace ParcheggioAPI
         {
             using(ParkingSystemContext model = new ParkingSystemContext()) 
             {
-                List<string> displayParking = model.Users.Select(s=>s.Username).ToList();
-                                                           
+                List<string> displayParking = model.Users.Select(s=>s.Username).ToList();                                      
                 return Ok(displayParking);
             }
 

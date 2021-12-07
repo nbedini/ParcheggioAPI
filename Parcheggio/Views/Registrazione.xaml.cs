@@ -34,26 +34,36 @@ namespace Parcheggio.Views
         {
             string username = tbUsername.Text;
             string password = tbPassword.Password;
-            object candidato = new { username = username, password = password };
-            var request = new HttpRequestMessage
+            if (password.Length > 5)
             {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("http://localhost:31329/api/Crea-Utente"),
-                Content = new StringContent(JsonConvert.SerializeObject(candidato), Encoding.UTF8, "application/json")
-            };
-            var response = await client.SendAsync(request);
-            if (response.IsSuccessStatusCode)
-            {
-                MessageBox.Show("Creazione utente andata a buon fine");
-                StatusChiusura = true;
-                this.Close();
+
+
+                object candidato = new { username = username, password = password };
+                var request = new HttpRequestMessage
+                {
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri("http://localhost:31329/api/Crea-Utente"),
+                    Content = new StringContent(JsonConvert.SerializeObject(candidato), Encoding.UTF8, "application/json")
+                };
+                var response = await client.SendAsync(request);
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Creazione utente andata a buon fine");
+                    StatusChiusura = true;
+                    this.Close();
+                }
+                else
+                {
+                    MessageBox.Show("Username già utilizzato");
+                    StatusChiusura = false;
+                }
             }
             else
             {
-                MessageBox.Show("Username già utilizzato");
+                MessageBox.Show("Password troppo breve");
                 StatusChiusura = false;
             }
-            
         }
 
         private void LoginClick(object sender, RoutedEventArgs e)
