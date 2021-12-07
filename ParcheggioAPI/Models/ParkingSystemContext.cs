@@ -60,7 +60,7 @@ namespace ParcheggioAPI.Models
 
             modelBuilder.Entity<ParkingAmount>(entity =>
             {
-                entity.HasKey(e => e.Giorno);
+                entity.HasKey(e => new { e.Giorno, e.NomeParcheggio });
 
                 entity.Property(e => e.Giorno).HasColumnType("datetime");
 

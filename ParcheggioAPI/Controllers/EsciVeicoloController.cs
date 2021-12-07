@@ -63,7 +63,7 @@ namespace ParcheggioAPI.Controllers
                     var giorno = TimeSpan.FromDays(1) - TimeSpan.FromMilliseconds(1);
                     var candidate = model.ParkingAmounts.FirstOrDefault(fod => fod.NomeParcheggio == o.NomeParcheggio && OrarioUscita.Date == fod.Giorno.Date);
                     candidate.IncassoTotale = model.ParkingHistorys
-                        .Where(w => w.NomeParcheggio == o.NomeParcheggio)
+                        .Where(w => w.NomeParcheggio == o.NomeParcheggio && w.DataOrarioUscita.Date == OrarioUscita.Date)
                         .Sum(s => s.Tariffa)
                         .ToString();
 
