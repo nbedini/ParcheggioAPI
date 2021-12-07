@@ -17,10 +17,10 @@ namespace Parcheggio.Views
     /// <summary>
     /// Logica di interazione per IncassoGiornaliero.xaml
     /// </summary>
-    public partial class IncassoGiornaliero : Window
+    public partial class IncassoStorico : Window
     {
         public string Parcheggio { get; set; }
-        public IncassoGiornaliero(string nomeParcheggio)
+        public IncassoStorico(string nomeParcheggio)
         {
             InitializeComponent();
 

@@ -41,7 +41,12 @@ namespace ParcheggioAPI.Controllers
 
                     SecurityToken token = TokenHandler.CreateToken(TokenDescriptor);
                     logger.Log(LogLevel.Info, "Login utente con username {User}.", usercredentials.Username);
-                    return Ok(TokenHandler.WriteToken(token).ToString());
+                    LoginClass LC = new LoginClass
+                    {
+                        Token = TokenHandler.WriteToken(token).ToString(),
+                        Username = candidate.Username
+                    };
+                    return Ok(LC);
                 }
                 else
                 {

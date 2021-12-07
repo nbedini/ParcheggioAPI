@@ -9,5 +9,6 @@
 
         public bool ParcheggioEsistenteMenu { get; set; }
         public bool ParcheggioNuovoMenu { get; set; }
+        public bool CambioParcheggio { get; set; }
     }
 }

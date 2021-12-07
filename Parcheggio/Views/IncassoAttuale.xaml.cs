@@ -15,18 +15,18 @@ using System.Windows.Shapes;
 namespace Parcheggio.Views
 {
     /// <summary>
-    /// Logica di interazione per ListaProprietari.xaml
+    /// Logica di interazione per IncassoGiornaliero.xaml
     /// </summary>
-    public partial class ListaProprietari : Window
+    public partial class IncassoAttuale : Window
     {
-        public string NomeParcheggio { get; set; }
-        public ListaProprietari()
+        public string Parcheggio { get; set; }
+        public IncassoAttuale(string nomeParcheggio)
         {
             InitializeComponent();
-            NomeParcheggio = MainWindow.NomeParcheggioCodeBehind;
-            WebBrowser webBrowser = new WebBrowser();
-            webBrowser.Source = new Uri($"http://localhost:34483/VisualizzaProprietari/{NomeParcheggio}");
-            DefaultGrid.Children.Add(webBrowser);
+
+            Parcheggio = nomeParcheggio;
+
+            this.DataContext = this;
         }
     }
 }

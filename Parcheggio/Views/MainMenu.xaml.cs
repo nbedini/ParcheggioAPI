@@ -92,33 +92,5 @@ namespace Parcheggio.Views
         }
 
         #endregion
-
-        private async void LogoutClick(object sender, RoutedEventArgs e)
-        {
-            MessageBoxResult result = MessageBox.Show("Sicuro di voler eseguire il logout ? " , "Conferma logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            switch (result)
-            {
-                case MessageBoxResult.Yes:
-                    {
-                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Properties.Settings.Token);
-                        var request = new HttpRequestMessage
-                        {
-                            Method = HttpMethod.Post,
-                            RequestUri = new Uri("http://localhost:31329/api/Logout"),
-
-                        };
-                        var response = await client.SendAsync(request);
-                        var risposta = await response.Content.ReadAsStringAsync();
-                        Properties.Settings.Token = "";
-                        LogoutEffettuato = true;
-                        this.Close();
-                        break;
-                    }
-                case MessageBoxResult.No:
-                    {
-                        break;
-                    }
-            }
-        }
     }
 }

@@ -214,6 +214,7 @@
       <DependentUpon>Database.edmx</DependentUpon>
     </Compile>
     <Compile Include="Models\DatiParcheggio.cs" />
+    <Compile Include="Models\LoginClass.cs" />
     <Compile Include="Models\OggettoEsciVeicolo.cs" />
     <Compile Include="Models\Parking.cs">
       <DependentUpon>Database.tt</DependentUpon>
@@ -245,8 +246,11 @@
     <Compile Include="Views\ControlloTarga.xaml.cs">
       <DependentUpon>ControlloTarga.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\IncassoGiornaliero.xaml.cs">
-      <DependentUpon>IncassoGiornaliero.xaml</DependentUpon>
+    <Compile Include="Views\IncassoStorico.xaml.cs">
+      <DependentUpon>IncassoStorico.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\IncassoAttuale.xaml.cs">
+      <DependentUpon>IncassoAttuale.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\InserimentoVeicolo.xaml.cs">
       <DependentUpon>InserimentoVeicolo.xaml</DependentUpon>
@@ -282,7 +286,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\IncassoGiornaliero.xaml">
+    <Page Include="Views\IncassoStorico.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\IncassoAttuale.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

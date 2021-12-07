@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Parcheggio.Views"
         mc:Ignorable="d"
-        Title="{Binding NomeParcheggioScelto}" Height="537" Width="1097" Icon="/Views/Icon.ico">
+        Title="{Binding NomeParcheggio}" Height="537" Width="1100" Icon="/Views/Icon.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="30"/>
@@ -13,20 +13,20 @@
         </Grid.RowDefinitions>
         <DockPanel Grid.Row="0">
             <Menu FontSize="19" Height="30">
-                <MenuItem Header="_Parcheggio" Height="30">
-                    <MenuItem Height="30" Header="_Ritorna al menù" Click="Ritorna_Menu" />
-                    <MenuItem Height="30" Header="_Stato Completo" Click="Stato_Completo"/>
-                </MenuItem>
-                <MenuItem Height="30" Header="_Storico">
-                    <MenuItem Height="30" Header="_Visualizza Storico" Click="Storico" />
-                </MenuItem>
-                <MenuItem Header="_Incassi" Height="30">
-                    <MenuItem Header="_Incasso Giornaliero" Height="30" Click="Incasso_Giornaliero"/>
-                    <MenuItem Header="_Incasso Storico" Height="30" Click="Incasso_Storico"/>
-                </MenuItem>
-                <MenuItem x:Name="itProprietari" Header="Proprietari" Height="30" Click="MenuItem_Click">
-                </MenuItem>
-                <MenuItem Header="Aggiorna" Click="Aggiorna" Height="30">
+                <Menu.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <DockPanel HorizontalAlignment="Stretch"/>
+                    </ItemsPanelTemplate>
+                </Menu.ItemsPanel>
+                <MenuItem Header="_Menù" Height="30" Click="Ritorna_Menu"/>
+                <MenuItem Height="30" Header="Veicoli Attuali" Click="Stato_Completo"/>
+                <MenuItem Height="30" Header="_Storico" Click="Storico"/>
+                <MenuItem Header="_Incasso Attuale" Height="30" Click="Incasso_Giornaliero"/>
+                <MenuItem Header="_Incasso Storico" Height="30" Click="Incasso_Storico"/>
+                <MenuItem x:Name="itProprietari" Header="Proprietari" Height="30" Click="MenuItem_Click"/>
+                <MenuItem Header="Aggiorna" Click="Aggiorna" Height="30"/>
+                <MenuItem Header="{Binding UserLoggato}" Height="30" HorizontalAlignment="Right">
+                    <MenuItem Header="Logout" Height="30" Click="Logout_Click"/>
                 </MenuItem>
             </Menu>
         </DockPanel>

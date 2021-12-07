@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -20,10 +21,13 @@ using ParcheggioAPI.Models;
 
 namespace Parcheggio.Views
 {
-    public partial class MainWindow : Window
+    public partial class MainWindow : Window, INotifyPropertyChanged
     {
         #region Properties
 
+        public bool PrimoAvvio { get; set; } = false;
+        public bool NienteRicarica { get; set; } = true;
+        public string UserLoggato { get; set; }
         public bool Status { get; set; } = false;
         public bool AdminYesONo { get; set; } 
         public string TargaStatoParcheggio { get; set; }
@@ -34,7 +38,20 @@ namespace Parcheggio.Views
         public bool ParcheggioEsistenteMenu { get; set; } = false;
         public bool ParcheggioNuovoMenu { get; set; } = false;
         public string ParcheggioEsistenteScelto { get; set; }
-        public static string NomeParcheggioScelto { get; set; }
+        private string nomeparcheggio;
+
+        public string NomeParcheggio
+        {
+            get { return nomeparcheggio; }
+            set 
+            { 
+                nomeparcheggio = value; 
+                if(PrimoAvvio) 
+                    OnPropertyChanged("NomeParcheggio"); 
+                NomeParcheggioCodeBehind = value; 
+            }
+        }
+        public static string NomeParcheggioCodeBehind { get; set; }
         public string NomeParcheggioCreato { get; set; }
         public bool LogoutEffettuato { get; set; } = true;
         public bool SwitchLoginRegistrazione { get; set; } = false;
@@ -44,11 +61,13 @@ namespace Parcheggio.Views
 
         HttpClient client = new HttpClient();
 
+        public event PropertyChangedEventHandler PropertyChanged;
+
         #endregion
 
         #region Costructor
 
-        public void Support()
+        public async Task SupportPrimaParte()
         {
             MainMenu MenuView = new MainMenu(AdminYesONo);
             MenuView.ShowDialog();
@@ -59,12 +78,40 @@ namespace Parcheggio.Views
             NomeParcheggioCreato = MenuView.NomeParcheggioCreato;
         }
 
+        public async Task SupportSecondaParte()
+        {
+            if (ParcheggioEsistenteMenu || ParcheggioNuovoMenu)
+            {
+                if (ParcheggioEsistenteMenu)
+                {
+                    NomeParcheggio = ParcheggioEsistenteScelto;
+                }
+                else if (ParcheggioNuovoMenu)
+                {
+                    NomeParcheggio = NomeParcheggioCreato;
+                }
+                InitializeComponent();
+                if (!AdminYesONo) itProprietari.Visibility = Visibility.Collapsed;
+                else itProprietari.Visibility = Visibility.Visible;
+                if(PrimoAvvio)
+                    await GenerazioneParcheggio(4,true);
+                else
+                    await GenerazioneParcheggio(1, false);
+                this.DataContext = this;
+
+            }
+            else
+                Application.Current.Shutdown();
+        }
+
         public MainWindow()
         {
             while (LogoutEffettuato)
             {
                 Login LoginView = new Login();
                 LoginView.ShowDialog();
+                NienteRicarica = false;
+                UserLoggato = LoginView.UsernameLogin;
                 AdminYesONo = LoginView.Risposta;
                 LoginChiusuraSenzaCompletamento = LoginView.LoginEffettuatoChiusuraForm;
                 SwitchLoginRegistrazione = LoginView.SwitchRegistrazione;
@@ -72,11 +119,12 @@ namespace Parcheggio.Views
                 {
                     Registrazione RegistrazioneView = new Registrazione();
                     RegistrazioneView.ShowDialog();
+                    UserLoggato = RegistrazioneView.UsernameRegistrato;
                     SwitchRegistrazioneLogin = RegistrazioneView.SwitchLogin;
                     RegistrazioneEffettuata = RegistrazioneView.StatusChiusura;
                     if (RegistrazioneEffettuata)
                     {
-                        Support();
+                        SupportPrimaParte();
                     }
                     else if (SwitchRegistrazioneLogin)
                     {
@@ -91,36 +139,23 @@ namespace Parcheggio.Views
                 {
                     break;
                 }
-                Support();
+                SupportPrimaParte();
             }
-            if (ParcheggioEsistenteMenu || ParcheggioNuovoMenu)
-            {
-                if (ParcheggioEsistenteMenu)
-                {
-                    NomeParcheggioScelto = ParcheggioEsistenteScelto;
-                }
-                else if (ParcheggioNuovoMenu)
-                {
-                    NomeParcheggioScelto = NomeParcheggioCreato;
-                }
-                InitializeComponent();
-                if (!AdminYesONo) itProprietari.Visibility = Visibility.Collapsed;
-                else itProprietari.Visibility = Visibility.Visible;
-                GenerazioneParcheggio(1);
-                this.DataContext = this;
-
-            }
-            else
-                Application.Current.Shutdown();
+            SupportSecondaParte();
         }
 
         #endregion
 
         #region Public Methods
 
-        public void AllButtonClick(object sender, EventArgs e)
+        public void OnPropertyChanged(string propertyname)
         {
-            StatoParcheggio StatoParcheggioView = new StatoParcheggio(sender, NomeParcheggioScelto);
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyname));
+        }
+
+        public async void AllButtonClick(object sender, EventArgs e)
+        {
+            StatoParcheggio StatoParcheggioView = new StatoParcheggio(sender, NomeParcheggio);
             StatoParcheggioView.ShowDialog();
             rigastatoparcheggio = StatoParcheggioView.RigaString;
             colonnastatoparcheggio = StatoParcheggioView.ColonnaString;
@@ -129,11 +164,11 @@ namespace Parcheggio.Views
             TargaStatoParcheggio = StatoParcheggioView.Targa;
             if (ChiusuraStatoParcheggio)
             {
-                GenerazioneParcheggio(3,rigastatoparcheggio, colonnastatoparcheggio);
+                await GenerazioneParcheggio(3,false,rigastatoparcheggio, colonnastatoparcheggio);
             }
             else if (ChiusuraStatoParcheggioEsci)
             {
-                GenerazioneParcheggio(2,rigastatoparcheggio,colonnastatoparcheggio);
+                await GenerazioneParcheggio(2,false,rigastatoparcheggio,colonnastatoparcheggio);
             }
         }
 
@@ -141,7 +176,7 @@ namespace Parcheggio.Views
 
         #region GenerazioneParcheggio usando API(int status, string rigaeliminata, string colonnaeliminata)
 
-        public async void GenerazioneParcheggio(int status, string rigaeliminata = "", string colonnaeliminata = "")
+        public async Task GenerazioneParcheggio(int status, bool cambioparcheggio, string rigaeliminata = "", string colonnaeliminata = "")
         {
             Grid grid = new Grid();
 
@@ -151,12 +186,13 @@ namespace Parcheggio.Views
                 RequestUri = new Uri("http://localhost:31329/api/parcheggioview"),
                 Content = new StringContent(JsonConvert.SerializeObject(new DatiParcheggio
                 {
-                    NomeParcheggio = NomeParcheggioScelto,
+                    NomeParcheggio = NomeParcheggio,
                     Status = status,
                     rigaeliminata = rigaeliminata,
                     colonnaeliminata = colonnaeliminata,
                     ParcheggioEsistenteMenu = this.ParcheggioEsistenteMenu,
-                    ParcheggioNuovoMenu = this.ParcheggioNuovoMenu
+                    ParcheggioNuovoMenu = this.ParcheggioNuovoMenu,
+                    CambioParcheggio = cambioparcheggio
                 }), Encoding.UTF8, "application/json")
             };
             var response = await client.SendAsync(request);
@@ -202,42 +238,74 @@ namespace Parcheggio.Views
             #endregion
 
         #region menù
-        private void Ritorna_Menu(object sender, RoutedEventArgs e)
+        private async void Ritorna_Menu(object sender, RoutedEventArgs e)
         {
-            MainWindow mw = new MainWindow();
-            mw.Show();
-            this.Close();
+            this.Hide();
+            PrimoAvvio = true;
+            await SupportPrimaParte();
+            await SupportSecondaParte();
+            Aggiorna(new { }, new RoutedEventArgs());
+            this.Show();
+            
         }
 
         private void Stato_Completo(object sender, RoutedEventArgs e)
         {
-            StatoCompleto sc = new StatoCompleto(NomeParcheggioScelto);
+            StatoCompleto sc = new StatoCompleto(NomeParcheggio);
             sc.ShowDialog();
         }
         private void Storico(object sender, RoutedEventArgs e)
         {
-            VisualizzaStorico vs = new VisualizzaStorico(NomeParcheggioScelto);
+            VisualizzaStorico vs = new VisualizzaStorico(NomeParcheggio);
             vs.ShowDialog();
         }
         private void Incasso_Storico(object sender, RoutedEventArgs e)
         {
-            
+            IncassoStorico ig = new IncassoStorico(NomeParcheggio);
+            ig.ShowDialog();
         }
         private void Incasso_Giornaliero(object sender, RoutedEventArgs e)
         {
-            IncassoGiornaliero ig = new IncassoGiornaliero(NomeParcheggioScelto);
+            IncassoAttuale ig = new IncassoAttuale(NomeParcheggio);
             ig.ShowDialog();
         }
-        private void Aggiorna(object sender, RoutedEventArgs e)
+        private async void Aggiorna(object sender, RoutedEventArgs e)
         {
-            GenerazioneParcheggio(4);
+            GenerazioneParcheggio(4,false);
         }
-        #endregion
-
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             ListaProprietari listaProprietariView = new ListaProprietari();
             listaProprietariView.ShowDialog();
         }
+        private async void Logout_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBoxResult result = MessageBox.Show("Sicuro di voler eseguire il logout ? ", "Conferma logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
+            switch (result)
+            {
+                case MessageBoxResult.Yes:
+                    {
+                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Properties.Settings.Token);
+                        var request = new HttpRequestMessage
+                        {
+                            Method = HttpMethod.Post,
+                            RequestUri = new Uri("http://localhost:31329/api/Logout"),
+
+                        };
+                        var response = await client.SendAsync(request);
+                        var risposta = await response.Content.ReadAsStringAsync();
+                        Properties.Settings.Token = "";
+                        LogoutEffettuato = true;
+                        Application.Current.Shutdown();
+                        System.Diagnostics.Process.Start(Environment.GetCommandLineArgs()[0]);
+                        break;
+                    }
+                case MessageBoxResult.No:
+                    {
+                        break;
+                    }
+            }
+        }
+        #endregion
     }
 }

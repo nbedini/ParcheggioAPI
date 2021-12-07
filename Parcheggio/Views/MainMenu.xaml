@@ -12,6 +12,5 @@
             <Button VerticalAlignment="Center" x:Name="btNuovo" Click="ParcheggioNuovoClick" FontSize="20" Content="Nuovo Parcheggio" Height="40" Margin="5"/>
             <Button VerticalAlignment="Center" x:Name="btEsistente" Click="ParcheggioEsistenteClick" FontSize="20" Content="Parcheggio Esistente" Height="40" Margin="5"/>
         </StackPanel>
-        <Button Content="Logout" HorizontalAlignment="Left" Margin="435,10,0,0" VerticalAlignment="Top" Width="79" Click="LogoutClick"/>
     </Grid>
 </Window>

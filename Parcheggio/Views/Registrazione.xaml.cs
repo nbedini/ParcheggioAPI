@@ -23,6 +23,7 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class Registrazione : Window
     {
+        public string UsernameRegistrato { get; set; }
         public bool SwitchLogin { get; set; } = false;
         public bool StatusChiusura { get; set; } = false;
         static HttpClient client = new HttpClient();
@@ -50,6 +51,7 @@ namespace Parcheggio.Views
                 
                 if (response.IsSuccessStatusCode)
                 {
+                    UsernameRegistrato = username;
                     StatusChiusura = true;
                     this.Close();
                 }

@@ -53,6 +53,13 @@ namespace ParcheggioAPI
                             riga = v.Riga;
                             colonna = v.Colonna;
                         }
+                        if (datiParcheggio.CambioParcheggio)
+                        {
+                            foreach(var delete in keyValues)
+                            {
+                                keyValues.Remove(delete.Key);
+                            }
+                        }
                         keyValues.Add(riga + colonna, v.Targa);
                     }
 
