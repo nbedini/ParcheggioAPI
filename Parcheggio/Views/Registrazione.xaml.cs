@@ -23,6 +23,7 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class Registrazione : Window
     {
+        public bool SwitchLogin { get; set; } = false;
         public bool StatusChiusura { get; set; } = false;
         static HttpClient client = new HttpClient();
         public Registrazione()
@@ -53,14 +54,12 @@ namespace Parcheggio.Views
                 MessageBox.Show("Username già utilizzato");
                 StatusChiusura = false;
             }
-            
         }
 
         private void LoginClick(object sender, RoutedEventArgs e)
         {
-            Login l = new Login();
-            l.Show();
-            this.Hide();
+            SwitchLogin = true;
+            this.Close();
         }
     }
 }

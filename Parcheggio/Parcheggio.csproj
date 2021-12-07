@@ -263,9 +263,6 @@
     <Compile Include="Views\Registrazione.xaml.cs">
       <DependentUpon>Registrazione.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\RegistrazioneLogin.xaml.cs">
-      <DependentUpon>RegistrazioneLogin.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\StatoCompleto.xaml.cs">
       <DependentUpon>StatoCompleto.xaml</DependentUpon>
     </Compile>
@@ -322,10 +319,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\Registrazione.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Views\RegistrazioneLogin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

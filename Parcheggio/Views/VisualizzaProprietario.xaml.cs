@@ -26,7 +26,7 @@ namespace Parcheggio.Views
             InitializeComponent();
             SelectedItem = VisualizzaStorico.SelectedItem;
             WebBrowser webBrowser = new WebBrowser();
-            webBrowser.Source = new Uri($"http://localhost:34483/VisualizzaProprietario/{SelectedItem.Propietario}");
+            webBrowser.Source = new Uri($"http://localhost:34483/VisualizzaProprietario/{SelectedItem.Propietario}/{SelectedItem.NomeParcheggio}");
             GridDefault.Children.Add(webBrowser);
             this.DataContext = this;
         }

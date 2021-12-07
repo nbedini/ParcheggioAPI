@@ -30,7 +30,7 @@ namespace Parcheggio.Views
         public bool NuovoParcheggioCreato { get; set; } = false;
         public string NomeParcheggioCreato { get; set; }
         public string ParcheggioScelto { get; set; }
-
+        public bool LogoutEffettuato { get; set; } = false;
 
 
         #endregion
@@ -63,7 +63,6 @@ namespace Parcheggio.Views
             else
             {
                 ParcheggioNuovo = false;
-                this.Close();
             }
         }
 
@@ -94,12 +93,6 @@ namespace Parcheggio.Views
 
         #endregion
 
-        private void AccessoClick(object sender, RoutedEventArgs e)
-        {
-            RegistrazioneLogin window = new RegistrazioneLogin();
-            window.Show(); 
-        }
-
         private async void LogoutClick(object sender, RoutedEventArgs e)
         {
             MessageBoxResult result = MessageBox.Show("Sicuro di voler eseguire il logout ? " , "Conferma logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
@@ -116,11 +109,9 @@ namespace Parcheggio.Views
                         };
                         var response = await client.SendAsync(request);
                         var risposta = await response.Content.ReadAsStringAsync();
-                        this.Close();
-                        RegistrazioneLogin RegistrazioneLogin = new RegistrazioneLogin();
-                        RegistrazioneLogin.ShowDialog();
                         Properties.Settings.Token = "";
-                        
+                        LogoutEffettuato = true;
+                        this.Close();
                         break;
                     }
                 case MessageBoxResult.No:

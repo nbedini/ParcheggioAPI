@@ -21,7 +21,8 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class Login : Window
     {
-
+        public bool SwitchRegistrazione { get; set; } = false;
+        public bool LoginEffettuatoChiusuraForm { get; set; } = false;
         public bool Risposta { get; set; }
         static HttpClient client = new HttpClient();
         public Login()
@@ -55,6 +56,7 @@ namespace Parcheggio.Views
                 var response2 = await client.SendAsync(request2);
                 var risposta = await response2.Content.ReadAsStringAsync();
                 Risposta = Boolean.Parse(risposta);
+                LoginEffettuatoChiusuraForm = true;
                 this.Close();
             }
             else
@@ -66,9 +68,8 @@ namespace Parcheggio.Views
 
         private void RegistrazioneClick(object sender, RoutedEventArgs e)
         {
-            Registrazione r = new Registrazione();
-            r.Show();
-            this.Hide();
+            SwitchRegistrazione = true;
+            this.Close();
         }
     }
 }

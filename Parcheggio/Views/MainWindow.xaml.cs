@@ -24,6 +24,7 @@ namespace Parcheggio.Views
     {
         #region Properties
 
+        public bool Status { get; set; } = false;
         public bool AdminYesONo { get; set; } 
         public string TargaStatoParcheggio { get; set; }
         public bool ChiusuraStatoParcheggioEsci { get; set; } = false;
@@ -34,6 +35,12 @@ namespace Parcheggio.Views
         public bool ParcheggioNuovoMenu { get; set; } = false;
         public string ParcheggioEsistenteScelto { get; set; }
         public string NomeParcheggioScelto { get; set; }
+        public string NomeParcheggioCreato { get; set; }
+        public bool LogoutEffettuato { get; set; } = true;
+        public bool SwitchLoginRegistrazione { get; set; } = false;
+        public bool SwitchRegistrazioneLogin { get; set; } = false;
+        public bool RegistrazioneEffettuata { get; set; } = false;
+        public bool LoginChiusuraSenzaCompletamento { get; set; } = false;
 
         HttpClient client = new HttpClient();
 
@@ -41,16 +48,51 @@ namespace Parcheggio.Views
 
         #region Costructor
 
-        public MainWindow()
+        public void Support()
         {
-            RegistrazioneLogin registrazioneLoginView = new RegistrazioneLogin();
-            registrazioneLoginView.ShowDialog();
-            AdminYesONo = registrazioneLoginView.AdminONo;
             MainMenu MenuView = new MainMenu(AdminYesONo);
             MenuView.ShowDialog();
+            LogoutEffettuato = MenuView.LogoutEffettuato;
             ParcheggioEsistenteScelto = MenuView.ParcheggioScelto;
             ParcheggioEsistenteMenu = MenuView.ParcheggioEsistenteProp;
             ParcheggioNuovoMenu = MenuView.ParcheggioNuovo;
+            NomeParcheggioCreato = MenuView.NomeParcheggioCreato;
+        }
+
+        public MainWindow()
+        {
+            while (LogoutEffettuato)
+            {
+                Login LoginView = new Login();
+                LoginView.ShowDialog();
+                AdminYesONo = LoginView.Risposta;
+                LoginChiusuraSenzaCompletamento = LoginView.LoginEffettuatoChiusuraForm;
+                SwitchLoginRegistrazione = LoginView.SwitchRegistrazione;
+                if (SwitchLoginRegistrazione)
+                {
+                    Registrazione RegistrazioneView = new Registrazione();
+                    RegistrazioneView.ShowDialog();
+                    SwitchRegistrazioneLogin = RegistrazioneView.SwitchLogin;
+                    RegistrazioneEffettuata = RegistrazioneView.StatusChiusura;
+                    if (RegistrazioneEffettuata)
+                    {
+                        Support();
+                    }
+                    else if (SwitchRegistrazioneLogin)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else if (!LoginChiusuraSenzaCompletamento)
+                {
+                    break;
+                }
+                Support();
+            }
             if (ParcheggioEsistenteMenu || ParcheggioNuovoMenu)
             {
                 if (ParcheggioEsistenteMenu)
@@ -59,7 +101,7 @@ namespace Parcheggio.Views
                 }
                 else if (ParcheggioNuovoMenu)
                 {
-                    NomeParcheggioScelto = MenuView.NomeParcheggioCreato;
+                    NomeParcheggioScelto = NomeParcheggioCreato;
                 }
                 InitializeComponent();
                 GenerazioneParcheggio(1);
