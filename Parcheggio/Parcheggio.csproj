@@ -272,6 +272,9 @@
     <Compile Include="Views\StatoParcheggio.xaml.cs">
       <DependentUpon>StatoParcheggio.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\VisualizzaProprietario.xaml.cs">
+      <DependentUpon>VisualizzaProprietario.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\VisualizzaStorico.xaml.cs">
       <DependentUpon>VisualizzaStorico.xaml</DependentUpon>
     </Compile>
@@ -331,6 +334,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\StatoParcheggio.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\VisualizzaProprietario.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

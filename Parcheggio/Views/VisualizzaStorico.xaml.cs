@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -11,48 +13,100 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Newtonsoft.Json;
 using Parcheggio.Models;
+using ParcheggioAPI.Models;
 
 namespace Parcheggio.Views
 {
     /// <summary>
     /// Logica di interazione per VisualizzaStorico.xaml
     /// </summary>
-    public partial class VisualizzaStorico : Window
+    public partial class VisualizzaStorico : Window, INotifyPropertyChanged
     {
+        HttpClient client = new HttpClient();
         public string Nome { get; set; }
+        private List<ParkingHistory> autoparcheggiate;  
+
+        public List<ParkingHistory> AutoParcheggiate
+        {
+            get { return autoparcheggiate; }
+            set { autoparcheggiate = value; }
+        }
+
+        private string cercaretarga;
+
+        public string CercareTarga
+        {
+            get { return cercaretarga; }
+            set { cercaretarga = value; }
+        }
+
+        private List<ParkingHistory> itemsource;
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        public List<ParkingHistory> ItemSource
+        {
+            get { return itemsource; }
+            set 
+            { 
+                itemsource = value;
+                OnPropertyChanged("ItemSource");
+            }
+        }
+        public static ParkingHistory SelectedItem { get; set; }
+
+        public void OnPropertyChanged(string propertyname)
+        {
+            PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyname));
+        }
+
         public VisualizzaStorico(string nome)
         {
             InitializeComponent();
             Nome = nome;
-            using(ParkingSystemEntities model = new ParkingSystemEntities())
-            {
-                Storico_Parcheggio.ItemsSource = model.ParkingHistorys.Where(o => o.NomeParcheggio == Nome).ToList();
-            }
+            GetStorico();
+            this.DataContext = this;
         }
 
-        private void Reset_Click(object sender, RoutedEventArgs e)
+        public async Task GetStorico()
         {
-            using (ParkingSystemEntities model = new ParkingSystemEntities())
+            HttpRequestMessage request = new HttpRequestMessage
             {
-                Storico_Parcheggio.ItemsSource = model.ParkingHistorys.Where(o => o.NomeParcheggio == Nome).ToList();
-            }
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://localhost:31329/api/storicoparcheggio/{Nome}")
+            };
+            var response = await client.SendAsync(request);
+            var data = JsonConvert.DeserializeObject<List<ParkingHistory>>(await response.Content.ReadAsStringAsync());
+            ItemSource = data;
         }
-        private void Proprietario_Click(object sender, RoutedEventArgs e)
+        private async void Proprietario_Click(object sender, RoutedEventArgs e)
         {
-            using (ParkingSystemEntities model = new ParkingSystemEntities())
-            {
-                var veicoloS = Storico_Parcheggio.SelectedItem;
-                
-            }
+            VisualizzaProprietario visualizzaProprietarioView = new VisualizzaProprietario();
+            visualizzaProprietarioView.ShowDialog();
         }
-        private void Cerca_Click(object sender, RoutedEventArgs e)
+        public async Task GetFilter(string targaparziale)
         {
-            using (ParkingSystemEntities model = new ParkingSystemEntities())
+            var request = new HttpRequestMessage
             {
-                Storico_Parcheggio.ItemsSource = model.ParkingHistorys.Where(o => o.Targa.Equals(tb_RicercaTarga.Text.ToString())).ToList();
-            }
+                Method = HttpMethod.Post,
+                RequestUri = new Uri("http://localhost:31329/api/storicoricercatarga"),
+                Content = new StringContent(JsonConvert.SerializeObject(new RicercaTarga
+                {
+                    targaparziale = targaparziale,
+                    NomeParcheggio = Nome
+                }), Encoding.UTF8, "application/json")
+            };
+            var response = await client.SendAsync(request);
+            var data = JsonConvert.DeserializeObject<List<ParkingHistory>>(await response.Content.ReadAsStringAsync());
+            AutoParcheggiate = data;
         }
 
+        private async void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            await GetFilter(CercareTarga);
+            ItemSource = AutoParcheggiate;
+        }
     }
 }

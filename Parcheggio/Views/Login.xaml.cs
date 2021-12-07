@@ -43,6 +43,7 @@ namespace Parcheggio.Views
             var response = await client.SendAsync(request);
             if (response.IsSuccessStatusCode)
             {
+                MessageBox.Show("Login avvenuto con successo");
                 var data = await response.Content.ReadAsStringAsync();
                 Properties.Settings.Token = data;
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", data);
@@ -59,7 +60,7 @@ namespace Parcheggio.Views
             }
             else
             {
-                MessageBox.Show("Qualcosa è andato storto");
+                MessageBox.Show("Password sbagliata");
             }
 
         }

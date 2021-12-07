@@ -1,4 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using NLog;
 using ParcheggioAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -11,6 +13,7 @@ namespace ParcheggioAPI.Controllers
     [ApiController]
     public class ControlloTargaController : Controller
     {
+        public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         [HttpGet]
         [Route("/api/checkTarga")]
         public IActionResult ControlloTarga([FromBody] string targaVeicolo)
@@ -24,6 +27,7 @@ namespace ParcheggioAPI.Controllers
                     string targa = model.Vehicles.FirstOrDefault(f => f.Targa == targaVeicolo).Targa;
                     if (targa == null)
                     {
+                        logger.Log(NLog.LogLevel.Fatal, "Veicolo non trovato.");
                         return NotFound("Veicolo non trovato");
                     }
 
@@ -34,6 +38,7 @@ namespace ParcheggioAPI.Controllers
                     //Definito il pattern della targa Europea, controlliamo se la targa del veicolo lo rispetta
                     if (Regex.IsMatch(targa, patternTarga.ToString()) == true)
                     {
+                        logger.Log(NLog.LogLevel.Info, "Macchina con targa {targa} inserita.", targa);
                         return Ok("La targa inserita è corretta e rispetta il pattern Europeo");
                     }
                     else

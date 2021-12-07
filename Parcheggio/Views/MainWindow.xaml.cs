@@ -24,6 +24,7 @@ namespace Parcheggio.Views
     {
         #region Properties
 
+        public bool ParcheggioEsistenteProp { get; set; } = false;
         public bool AdminYesONo { get; set; } 
         public string TargaStatoParcheggio { get; set; }
         public bool ChiusuraStatoParcheggioEsci { get; set; } = false;
@@ -43,10 +44,11 @@ namespace Parcheggio.Views
 
         public MainWindow()
         {
+            MainMenu MenuView = new MainMenu(AdminYesONo);
             RegistrazioneLogin registrazioneLoginView = new RegistrazioneLogin();
             registrazioneLoginView.ShowDialog();
             AdminYesONo = registrazioneLoginView.AdminONo;
-            MainMenu MenuView = new MainMenu(AdminYesONo);
+            MenuView = new MainMenu(AdminYesONo);
             MenuView.ShowDialog();
             ParcheggioEsistenteScelto = MenuView.ParcheggioScelto;
             ParcheggioEsistenteMenu = MenuView.ParcheggioEsistenteProp;
