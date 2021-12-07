@@ -83,8 +83,13 @@ namespace Parcheggio.Views
         }
         private async void Proprietario_Click(object sender, RoutedEventArgs e)
         {
-            VisualizzaProprietario visualizzaProprietarioView = new VisualizzaProprietario();
-            visualizzaProprietarioView.ShowDialog();
+            if(SelectedItem != null)
+            {
+                VisualizzaProprietario visualizzaProprietarioView = new VisualizzaProprietario();
+                visualizzaProprietarioView.ShowDialog();
+            }
+            else
+                MessageBox.Show("Non è stata selezionata nessuna riga", "Impossibile visualizzare il proprietario", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         public async Task GetFilter(string targaparziale)
         {

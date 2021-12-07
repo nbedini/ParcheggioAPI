@@ -251,6 +251,9 @@
     <Compile Include="Views\InserimentoVeicolo.xaml.cs">
       <DependentUpon>InserimentoVeicolo.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\ListaProprietari.xaml.cs">
+      <DependentUpon>ListaProprietari.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Login.xaml.cs">
       <DependentUpon>Login.xaml</DependentUpon>
     </Compile>
@@ -284,6 +287,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\InserimentoVeicolo.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ListaProprietari.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

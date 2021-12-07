@@ -34,7 +34,7 @@ namespace Parcheggio.Views
         public bool ParcheggioEsistenteMenu { get; set; } = false;
         public bool ParcheggioNuovoMenu { get; set; } = false;
         public string ParcheggioEsistenteScelto { get; set; }
-        public string NomeParcheggioScelto { get; set; }
+        public static string NomeParcheggioScelto { get; set; }
         public string NomeParcheggioCreato { get; set; }
         public bool LogoutEffettuato { get; set; } = true;
         public bool SwitchLoginRegistrazione { get; set; } = false;
@@ -50,9 +50,6 @@ namespace Parcheggio.Views
 
         public void Support()
         {
-            RegistrazioneLogin registrazioneLoginView = new RegistrazioneLogin();
-            registrazioneLoginView.ShowDialog();
-            AdminYesONo = registrazioneLoginView.AdminONo;
             MainMenu MenuView = new MainMenu(AdminYesONo);
             MenuView.ShowDialog();
             LogoutEffettuato = MenuView.LogoutEffettuato;
@@ -233,5 +230,11 @@ namespace Parcheggio.Views
             GenerazioneParcheggio(4);
         }
         #endregion
+
+        private void MenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            ListaProprietari listaProprietariView = new ListaProprietari();
+            listaProprietariView.ShowDialog();
+        }
     }
 }
