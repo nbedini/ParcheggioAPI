@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ParkingWeb.Models;
+using ParkingWeb.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-
 namespace ParkingWeb.Controllers
 {
     public class HomeController : Controller
@@ -18,9 +18,14 @@ namespace ParkingWeb.Controllers
             _logger = logger;
         }
 
-        public IActionResult Index()
+        [HttpGet("/Index/{nomeParcheggio}")]
+        public IActionResult Index(string nomeParcheggio)
         {
-            return View();
+            ParcheggioDetailsModel pdm = new ParcheggioDetailsModel
+            {
+                NomeParcheggio = nomeParcheggio
+            };
+            return View(pdm);
         }
 
         public IActionResult Privacy()

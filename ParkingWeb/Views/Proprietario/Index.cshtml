@@ -1,7 +1,7 @@
-﻿@model ParkingWeb.Models.Proprietario_Macchine
+﻿@model ParkingWeb.ViewModels.ParcheggioDetailsModel
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = Model.NomeParcheggio;
 }
 
 <h1>Proprietario</h1>
@@ -11,7 +11,7 @@
      "Modifica proprietario",// linkText
      "ModificaProprietario",// actionName
      "Proprietario",// controllerName
-     new {Model.Persona.CodiceFiscale}
+     new {Model.Proprietario_Macchine.Persona.CodiceFiscale}
  )
     </a>
 </div>
@@ -19,22 +19,22 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Persona.Nome)
+            @Html.DisplayNameFor(model => model.Proprietario_Macchine.Persona.Nome)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Persona.Nome)
+            @Html.DisplayFor(model => model.Proprietario_Macchine.Persona.Nome)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Persona.Cognome)
+            @Html.DisplayNameFor(model => model.Proprietario_Macchine.Persona.Cognome)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Persona.Cognome)
+            @Html.DisplayFor(model => model.Proprietario_Macchine.Persona.Cognome)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Persona.DataNascita)
+            @Html.DisplayNameFor(model => model.Proprietario_Macchine.Persona.DataNascita)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Persona.DataNascita)
+            @Html.DisplayFor(model => model.Proprietario_Macchine.Persona.DataNascita)
         </dd>
     </dl>
 </div>
@@ -49,7 +49,7 @@
             <th>Modello</th>
             <th>Tipo Veicolo</th>
         </tr>
-        @foreach (var d in Model.Veicoli)
+        @foreach (var d in Model.Proprietario_Macchine.Veicoli)
         {
             <tr>
                 <td>@d.Targa</td>

@@ -1,0 +1,55 @@
+﻿@model IEnumerable<ParkingWeb.Model.Person>
+
+@{
+    ViewData["Title"] = "Proprietari";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Proprietari Veicoli </h1>
+
+<p>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+               Nome
+            </th>
+            <th>
+                Cognome
+            </th>
+            <th>
+                Data Nascita
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (ParkingWeb.Model.Person p  in Model) {
+        <tr>
+            <th>
+                @p.Nome
+            </th>
+            <th>
+                @p.Cognome
+            </th>
+            <th>
+                @p.DataNascita
+            </th>
+            <th>
+                @p.CodiceFiscale
+            </th>
+            <td>
+                <a>
+                    @Html.ActionLink(
+"Visualizza proprietario",// linkText
+"Index",// actionName
+"VisualizzaProprietario",// controllerName
+new { codiceFiscale = p.CodiceFiscale },
+new { NomeParcheggio = "Elettric80" })
+                </a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

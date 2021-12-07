@@ -5,14 +5,16 @@ using System.Linq;
 using System.Threading.Tasks;
 using ParkingWeb.Models;
 using ParkingWeb.Model;
+using ParkingWeb.ViewModels;
 
 namespace ParkingWeb.Controllers
 {
     public class ProprietarioController : Controller
     {
-        [HttpGet("/VisualizzaProprietario/{codiceFiscale}")]
-        public IActionResult Index(string codiceFiscale)
+        [HttpGet("/VisualizzaProprietario/{codiceFiscale}/{NomeParcheggio}")]
+        public IActionResult Index(string codiceFiscale,string NomeParcheggio)
         {
+            if (String.IsNullOrEmpty(NomeParcheggio)) return Problem("Nome parcheggio non valido");
             if (codiceFiscale.Length > 16 || codiceFiscale.Length < 16) return Problem("Codice fiscale non valido");
             using (ParkingSystemContext model = new ParkingSystemContext())
             {
@@ -27,13 +29,54 @@ namespace ParkingWeb.Controllers
                     Veicoli = macchine
                 };
 
-                return View(pm);
+                ParcheggioDetailsModel pdm = new ParcheggioDetailsModel
+                {
+                    NomeParcheggio = NomeParcheggio,
+                    Proprietario_Macchine = pm
+                };
+
+                return View(pdm);
             }
         }
 
-        [HttpGet("/ModificaProprietario/{codiceFiscale}")]
-        public ActionResult ModificaProprietario(string codiceFiscale)
+
+        [HttpGet("/VisualizzaProprietari/{NomeParcheggio}")]
+        public IActionResult All(string NomeParcheggio)
         {
+            if (String.IsNullOrEmpty(NomeParcheggio)) return Problem("Nome parcheggio non valido");
+            using (ParkingSystemContext model = new ParkingSystemContext())
+            {
+
+                var targhe = model.ParkingHistorys.Where(o => o.NomeParcheggio.Equals(NomeParcheggio)).Select(o => o.Targa).ToList();
+                var proprietari_history = model.ParkingHistorys.Where(o => o.NomeParcheggio.Equals(NomeParcheggio)).Select(o => o.Propietario).ToList();
+
+                List<string> p = new List<string>();
+
+                for(int i=0;i<proprietari_history.Count;i++)
+                {
+                    if (!p.Contains(proprietari_history[i]))
+                        p.Add(proprietari_history[i]);
+                }
+
+                ListaProprietari lp = new ListaProprietari
+                {
+                    CodiciFiscali = p
+                };
+
+                List<Person> persone = new List<Person>(lp.Proprietari);
+                
+
+                return View(persone);
+            }
+        }
+
+
+
+
+        [HttpGet("/ModificaProprietario/{codiceFiscale}/{NomeParcheggio}")]
+        public ActionResult ModificaProprietario(string codiceFiscale,string NomeParcheggio)
+        {
+            if (String.IsNullOrEmpty(NomeParcheggio)) return Problem("Nome parcheggio non valido");
             if (codiceFiscale.Length > 16 || codiceFiscale.Length < 16) return Problem("Codice fiscale non valido");
             using (ParkingSystemContext model = new ParkingSystemContext())
             {
@@ -44,9 +87,10 @@ namespace ParkingWeb.Controllers
         }
 
 
-        [HttpPost("/ModificaProprietario/{codiceFiscale}")]
-        public ActionResult ModificaProprietario(string codiceFiscale,[FromForm] Person aggiornamento)
+        [HttpPost("/ModificaProprietario/{codiceFiscale}/{NomeParcheggio}")]
+        public ActionResult ModificaProprietario(string codiceFiscale,string NomeParcheggio,[FromForm] Person aggiornamento)
         {
+            if (String.IsNullOrEmpty(NomeParcheggio)) return Problem("Nome parcheggio non valido");
             if (aggiornamento.CodiceFiscale.Length > 16 || aggiornamento.CodiceFiscale.Length < 16
                 || String.IsNullOrEmpty(aggiornamento.Cognome) || String.IsNullOrEmpty(aggiornamento.Nome)) return Problem("Dati passati non corretti");
 
