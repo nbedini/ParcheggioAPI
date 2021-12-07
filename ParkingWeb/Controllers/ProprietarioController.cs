@@ -11,8 +11,8 @@ namespace ParkingWeb.Controllers
 {
     public class ProprietarioController : Controller
     {
-        [HttpGet("/VisualizzaProprietario/{codiceFiscale}/{NomeParcheggio}")]
-        public IActionResult Index(string codiceFiscale,string NomeParcheggio)
+        [HttpGet("/VisualizzaProprietario/{codiceFiscale}/{NomeParcheggio}/{Identificativo}")]
+        public IActionResult Index(string codiceFiscale,string NomeParcheggio,bool Identificativo = true)
         {
             if (String.IsNullOrEmpty(NomeParcheggio)) return Problem("Nome parcheggio non valido");
             if (codiceFiscale.Length > 16 || codiceFiscale.Length < 16) return Problem("Codice fiscale non valido");
@@ -32,7 +32,8 @@ namespace ParkingWeb.Controllers
                 ParcheggioDetailsModel pdm = new ParcheggioDetailsModel
                 {
                     NomeParcheggio = NomeParcheggio,
-                    Proprietario_Macchine = pm
+                    Proprietario_Macchine = pm,
+                    Identificativo = Identificativo
                 };
 
                 return View(pdm);
@@ -63,10 +64,18 @@ namespace ParkingWeb.Controllers
                     CodiciFiscali = p
                 };
 
-                List<Person> persone = new List<Person>(lp.Proprietari);
-                
+                ParcheggioDetailsModel pdm = new ParcheggioDetailsModel
+                {
+                    NomeParcheggio = NomeParcheggio
+                };
 
-                return View(persone);
+                persone_detailParcheggio pdp = new persone_detailParcheggio
+                {
+                    Persone = lp.Proprietari,
+                    ParcheggioDetailsModel = pdm
+                };
+
+                return View(pdp);
             }
         }
 
@@ -82,31 +91,38 @@ namespace ParkingWeb.Controllers
             {
                 var proprietario = model.Persons.FirstOrDefault(o => o.CodiceFiscale.Equals(codiceFiscale));
                 if (proprietario == null) return NotFound("Persona non trovata");
-                return View(proprietario);
+
+                ParcheggioDetailsModel pdm = new ParcheggioDetailsModel
+                {
+                    NomeParcheggio = NomeParcheggio,
+                    Persona = proprietario
+                };
+
+                return View(pdm);
             }
         }
 
 
         [HttpPost("/ModificaProprietario/{codiceFiscale}/{NomeParcheggio}")]
-        public ActionResult ModificaProprietario(string codiceFiscale,string NomeParcheggio,[FromForm] Person aggiornamento)
+        public ActionResult ModificaProprietario(string codiceFiscale,string NomeParcheggio,[FromForm] ParcheggioDetailsModel aggiornamento)
         {
             if (String.IsNullOrEmpty(NomeParcheggio)) return Problem("Nome parcheggio non valido");
-            if (aggiornamento.CodiceFiscale.Length > 16 || aggiornamento.CodiceFiscale.Length < 16
-                || String.IsNullOrEmpty(aggiornamento.Cognome) || String.IsNullOrEmpty(aggiornamento.Nome)) return Problem("Dati passati non corretti");
+            if (aggiornamento.Persona.CodiceFiscale.Length > 16 || aggiornamento.Persona.CodiceFiscale.Length < 16
+                || String.IsNullOrEmpty(aggiornamento.Persona.Cognome) || String.IsNullOrEmpty(aggiornamento.Persona.Nome)) return Problem("Dati passati non corretti");
 
             using (ParkingSystemContext model = new ParkingSystemContext())
             {
-                var proprietario = model.Persons.FirstOrDefault(o => o.CodiceFiscale.Equals(aggiornamento.CodiceFiscale));
+                var proprietario = model.Persons.FirstOrDefault(o => o.CodiceFiscale.Equals(aggiornamento.Persona.CodiceFiscale));
                 if (proprietario == null) return NotFound("Persona non trovata");
 
-                proprietario.CodiceFiscale = aggiornamento.CodiceFiscale;
-                proprietario.Cognome = aggiornamento.Cognome;
-                proprietario.DataNascita = aggiornamento.DataNascita;
-                proprietario.Nome = aggiornamento.Nome; 
+                proprietario.CodiceFiscale = aggiornamento.Persona.CodiceFiscale;
+                proprietario.Cognome = aggiornamento.Persona.Cognome;
+                proprietario.DataNascita = aggiornamento.Persona.DataNascita;
+                proprietario.Nome = aggiornamento.Persona.Nome; 
 
                 model.SaveChanges();
 
-                return RedirectToAction("Index", new { codiceFiscale = proprietario.CodiceFiscale});
+                return Redirect($"http://localhost:34483/VisualizzaProprietari/{NomeParcheggio}");
             }
         }
     }

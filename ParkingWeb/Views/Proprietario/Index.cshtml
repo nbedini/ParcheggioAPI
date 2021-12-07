@@ -6,14 +6,7 @@
 
 <h1>Proprietario</h1>
 <div>
-    <a>
-        @Html.ActionLink(
-     "Modifica proprietario",// linkText
-     "ModificaProprietario",// actionName
-     "Proprietario",// controllerName
-     new {Model.Proprietario_Macchine.Persona.CodiceFiscale}
- )
-    </a>
+   
 </div>
 <div>
     <hr />
@@ -37,6 +30,12 @@
             @Html.DisplayFor(model => model.Proprietario_Macchine.Persona.DataNascita)
         </dd>
     </dl>
+    @if(Model.Identificativo)
+    {
+        <a href="http://localhost:34483/VisualizzaProprietari/@Model.NomeParcheggio">
+            Ritorna alla lista
+        </a>
+    }
 </div>
 
 <div>
