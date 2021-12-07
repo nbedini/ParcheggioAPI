@@ -14,8 +14,12 @@ namespace ParkingWeb.Controllers
         [Route("/Incassi")]
         public IActionResult Index()
         {
-            List<IncassiGornalieri> incassi = new List<IncassiGornalieri>();
-            return View(incassi);
+            using(ParkingSystemContext model = new ParkingSystemContext())
+            {
+                IncassiGornalieri listaIncassi = new IncassiGornalieri();
+                listaIncassi.Incassi = model.ParkingAmounts.ToList();
+                return View(listaIncassi);
+            }
         }
     }
 }
