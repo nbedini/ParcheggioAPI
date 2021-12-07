@@ -1,0 +1,40 @@
+﻿@model ParkingWeb.Models.ParkingHistoryListView
+@{
+    ViewData["Title"] = "Storico Parcheggi";
+}
+
+<h1>Visualizza Storico</h1>
+
+<table class="table table-hover">
+    <thead>
+        <tr style="font-weight:bold">
+            <td>Proprietario</td>
+            <td>Tipo Veicolo</td>
+            <td>Targa</td>
+            <td>Data-Orario Entrata</td>
+            <td>Data-Orario Uscita</td>
+            <td>Nome Parcheggio</td>
+            <td>Riga</td>
+            <td>Colonna</td>
+            <td>Tariffa</td>
+        </tr>
+    </thead>
+
+    <tbody>
+        @foreach (var history in Model.parkingHistories)
+        {
+            <tr>
+                <td>@history.Propietario</td>
+                <td>@history.TipoVeicolo</td>
+                <td>@history.Targa</td>
+                <td>@history.DataOrarioEntrata</td>
+                <td>@history.DataOrarioUscita</td>
+                <td>@history.NomeParcheggio</td>
+                <td>@history.Riga</td>
+                <td>@history.Colonna</td>
+                <td>@history.Tariffa</td>
+            </tr>
+        }
+    </tbody>
+</table>
+

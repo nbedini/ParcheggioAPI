@@ -13,26 +13,26 @@ namespace ParcheggioAPI.Controllers
     {
         [HttpGet]
         [Route("/api/checkTarga")]
-        public IActionResult ControlloTarga([FromBody] string targaVeicolo)
+        public IActionResult ControlloTarga([FromBody] Veicolo veicolo)
         {
             //facciamo un controllo sulla lunghezza dei caratteri della targa
-            if (targaVeicolo.Length == 7)
+            if (veicolo.Targa.Length == 7)
             {
                 using (ParkingSystemContext model = new ParkingSystemContext())
                 {
-                    //Verifico se nel DB sia presente un veicolo con la targa riportata
+                    /*//Verifico se nel DB sia presente un veicolo con la targa riportata
                     string targa = model.Vehicles.FirstOrDefault(f => f.Targa == targaVeicolo).Targa;
                     if (targa == null)
                     {
                         return NotFound("Veicolo non trovato");
-                    }
+                    }*/
 
                     //genero il pattern della targa, sappiamo che ha due caratteri
                     //alfabetici, seguiti da 3 caratteri numerici e altri due caratteri alfabetici (es. FF 456 JT)
                     Regex patternTarga = new Regex(@"^[A-Za-z]{2}[0-9]{3}[A-Za-z]{2}");
 
                     //Definito il pattern della targa Europea, controlliamo se la targa del veicolo lo rispetta
-                    if (Regex.IsMatch(targa, patternTarga.ToString()) == true)
+                    if (Regex.IsMatch(veicolo.Targa, patternTarga.ToString()) == true)
                     {
                         return Ok("La targa inserita è corretta e rispetta il pattern Europeo");
                     }
