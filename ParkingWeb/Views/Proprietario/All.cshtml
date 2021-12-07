@@ -1,4 +1,4 @@
-﻿@model IEnumerable<ParkingWeb.Model.Person>
+﻿@model ParkingWeb.ViewModels.persone_detailParcheggio
 
 @{
     ViewData["Title"] = "Proprietari";
@@ -21,11 +21,13 @@
             <th>
                 Data Nascita
             </th>
-            <th></th>
+            <th>
+                Codice Fiscale Proprietario
+            </th>
         </tr>
     </thead>
     <tbody>
-@foreach (ParkingWeb.Model.Person p  in Model) {
+@foreach (ParkingWeb.Model.Person p  in Model.Persone) {
         <tr>
             <th>
                 @p.Nome
@@ -40,13 +42,12 @@
                 @p.CodiceFiscale
             </th>
             <td>
-                <a>
-                    @Html.ActionLink(
-"Visualizza proprietario",// linkText
-"Index",// actionName
-"VisualizzaProprietario",// controllerName
-new { codiceFiscale = p.CodiceFiscale },
-new { NomeParcheggio = "Elettric80" })
+                <a href="http://localhost:34483/VisualizzaProprietario/@p.CodiceFiscale/@Model.ParcheggioDetailsModel.NomeParcheggio/True">
+                    Visualizza veicoli
+                </a>
+                <br />
+                <a href="http://localhost:34483/ModificaProprietario/@p.CodiceFiscale/@Model.ParcheggioDetailsModel.NomeParcheggio">
+                    Modifica Persona
                 </a>
             </td>
         </tr>
