@@ -104,8 +104,11 @@ namespace Parcheggio.Views
                     NomeParcheggioScelto = NomeParcheggioCreato;
                 }
                 InitializeComponent();
+                if (!AdminYesONo) itProprietari.Visibility = Visibility.Collapsed;
+                else itProprietari.Visibility = Visibility.Visible;
                 GenerazioneParcheggio(1);
                 this.DataContext = this;
+
             }
             else
                 Application.Current.Shutdown();

@@ -24,7 +24,7 @@
                     <MenuItem Header="_Incasso Giornaliero" Height="30" Click="Incasso_Giornaliero"/>
                     <MenuItem Header="_Incasso Storico" Height="30" Click="Incasso_Storico"/>
                 </MenuItem>
-                <MenuItem Header="Proprietari" Height="30" Click="MenuItem_Click">
+                <MenuItem x:Name="itProprietari" Header="Proprietari" Height="30" Click="MenuItem_Click">
                 </MenuItem>
                 <MenuItem Header="Aggiorna" Click="Aggiorna" Height="30">
                 </MenuItem>
