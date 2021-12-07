@@ -20,13 +20,15 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class VisualizzaProprietario : Window
     {
+        public bool AperturaConWPF { get; set; } = true;
         public ParkingHistory SelectedItem { get; set; }
         public VisualizzaProprietario()
         {
             InitializeComponent();
+            AperturaConWPF = false;
             SelectedItem = VisualizzaStorico.SelectedItem;
             WebBrowser webBrowser = new WebBrowser();
-            webBrowser.Source = new Uri($"http://localhost:34483/VisualizzaProprietario/{SelectedItem.Propietario}/{SelectedItem.NomeParcheggio}");
+            webBrowser.Source = new Uri($"http://localhost:34483/VisualizzaProprietario/{SelectedItem.Propietario}/{SelectedItem.NomeParcheggio}/{AperturaConWPF}");
             GridDefault.Children.Add(webBrowser);
             this.DataContext = this;
         }
