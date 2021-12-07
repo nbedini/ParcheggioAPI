@@ -23,6 +23,7 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class Login : Window
     {
+        public string UsernameForm { get; set; }
         public string UsernameLogin { get; set; }
         public bool SwitchRegistrazione { get; set; } = false;
         public bool LoginEffettuatoChiusuraForm { get; set; } = false;
@@ -31,13 +32,13 @@ namespace Parcheggio.Views
         public Login()
         {
             InitializeComponent();
+            this.DataContext = this;
         }
 
         private async void SubmitClick(object sender, RoutedEventArgs e)
         {
-            string username = tbUsername.Text;
             string password = tbPassword.Password;
-            object candidato = new { username = username, password = password };
+            object candidato = new { username = UsernameForm, password = password };
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,

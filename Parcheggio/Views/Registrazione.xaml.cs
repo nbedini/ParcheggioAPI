@@ -23,6 +23,7 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class Registrazione : Window
     {
+        public string UsernameForm { get; set; }
         public string UsernameRegistrato { get; set; }
         public bool SwitchLogin { get; set; } = false;
         public bool StatusChiusura { get; set; } = false;
@@ -34,13 +35,10 @@ namespace Parcheggio.Views
 
         private async void SubmitClick(object sender, RoutedEventArgs e)
         {
-            string username = tbUsername.Text;
             string password = tbPassword.Password;
             if (password.Length > 5)
             {
-
-
-                object candidato = new { username = username, password = password };
+                object candidato = new { username = UsernameForm, password = password };
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,
@@ -51,7 +49,7 @@ namespace Parcheggio.Views
                 
                 if (response.IsSuccessStatusCode)
                 {
-                    UsernameRegistrato = username;
+                    UsernameRegistrato = UsernameForm;
                     StatusChiusura = true;
                     this.Close();
                 }

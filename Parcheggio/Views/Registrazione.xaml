@@ -5,14 +5,47 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Parcheggio.Views"
         mc:Ignorable="d"
-        Title="Registrazione" Height="450" Width="800">
+        Title="Registrazione" Height="550" Width="800">
     <Grid>
-        <PasswordBox x:Name="tbPassword" HorizontalAlignment="Left" Height="36" Margin="308,284,0,0" VerticalAlignment="Top" Width="231" FontSize="20"/>
-        <TextBox x:Name="tbUsername" HorizontalAlignment="Left" Height="36" Margin="308,144,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="231" RenderTransformOrigin="-1.574,0.753" FontSize="20"/>
-        <Label Content="USERNAME" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="41,144,0,0" Height="52" Width="220" FontSize="28"/>
-        <Label Content="PASSWORD" HorizontalAlignment="Left" Margin="41,281,0,0" VerticalAlignment="Top" RenderTransformOrigin="-0.469,0.946" Height="39" Width="220" FontSize="28"/>
-        <Button Content="Registrati" HorizontalAlignment="Left" Margin="613,339,0,0" VerticalAlignment="Top" Width="139" Height="49" FontSize="20" Click="SubmitClick"/>
-        <Button Content="Login" HorizontalAlignment="Left" Margin="613,10,0,0" VerticalAlignment="Top" Width="139" Height="41" FontSize="20" Click="LoginClick"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="50"/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="50"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="30"/>
+            <RowDefinition Height="100"/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition Height="40"/>
+        </Grid.RowDefinitions>
+        <Label Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="60" Content="Parcheggio Registrazione"/>
+        <PasswordBox Grid.Column="2" Grid.Row="3" x:Name="tbPassword" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" FontSize="35"/>
+        <TextBox Grid.Column="2" Grid.Row="2" FontSize="35" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <Label HorizontalContentAlignment="Center" VerticalContentAlignment="Center" Grid.Column="1" Grid.Row="2" Content="Username" FontSize="35"/>
+        <Label Grid.Column="1" Grid.Row="3" Content="Password" FontSize="35" HorizontalContentAlignment="Center" VerticalContentAlignment="Center"/>
+        <StackPanel Grid.Row="4" Grid.ColumnSpan="2" Grid.Column="1">
+            <Grid Height="110" Width="700">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.5*"/>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1.5*"/>
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="2" Height="60" Grid.Row="3" Content="Registratrazione" FontSize="20" Click="SubmitClick"/>
+                <TextBlock HorizontalAlignment="Center" Text="Possiedi già un account?" Grid.Row="1" Grid.Column="0" FontSize="20"/>
+                <Button Grid.Column="0" Height="60" Grid.Row="3" Content="Login" Margin="50,0,50,0" FontSize="20" Click="SubmitClick"/>
+
+            </Grid>
+        </StackPanel>
 
     </Grid>
 </Window>
