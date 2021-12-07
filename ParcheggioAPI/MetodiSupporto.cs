@@ -192,5 +192,21 @@ namespace ParcheggioAPI
                     return null;
             }
         }
+
+        //Creiamo il metodo per il recupero dati dal DB
+        public static List<ParkingStatuss> RecuperoDatiDB(out List<Person> people)
+        {
+            using (ParkingSystemContext model = new ParkingSystemContext())
+            {
+                var VeicoliAttualmenteParcheggiati = model.ParkingStatusses
+                    .ToList();
+
+                var ProprietariAttualmenteRegistrati = model.Persons
+                    .ToList();
+
+                people = ProprietariAttualmenteRegistrati;
+                return VeicoliAttualmenteParcheggiati;
+            }
+        }
     }
 }

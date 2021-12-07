@@ -13,7 +13,15 @@ namespace ParcheggioAPI.Controllers
     {
         //Liste di dati Contenuti nel DB
         public List<ParkingStatuss> VeicoliAttualmenteParcheggiati { get; set; }
-        public List<Person> ProprietariAttualmenteRegistrati { get; set; }
+
+        private List<Person> proprietariattualmenteregistrati;
+
+        public List<Person> ProprietariAttualmenteRegistrati
+        {
+            get { return proprietariattualmenteregistrati; }
+            set { proprietariattualmenteregistrati = value; }
+        }
+
 
         [HttpPut("api/inserisciveicolo")]
         public IActionResult Inserimento([FromBody] OggettoEntrata o)
@@ -23,8 +31,7 @@ namespace ParcheggioAPI.Controllers
             if (o.Proprietario.Nome != null && o.Proprietario.Cognome != null && o.Proprietario.CodiceFiscale != null && o.Veicolo.Marca != null && o.Veicolo.Modello != null && o.Veicolo.Targa != null)
             {
                 //Scarichiamo i dati dal DB
-                Thread thread = new Thread(new ThreadStart(RecuperoDatiDB));
-                thread.Start();
+                VeicoliAttualmenteParcheggiati = MetodiSupporto.RecuperoDatiDB(out proprietariattualmenteregistrati);
 
                 //Controlliamo se il DB non ha scaricato nulla
                 if(VeicoliAttualmenteParcheggiati == null || ProprietariAttualmenteRegistrati == null)
@@ -89,28 +96,18 @@ namespace ParcheggioAPI.Controllers
             }
         }
 
-        //Creiamo il metodo per il recupero dati dal DB
-        public void RecuperoDatiDB()
-        {
-            using (ParkingSystemContext model = new ParkingSystemContext())
-            {
-                VeicoliAttualmenteParcheggiati = model.ParkingStatusses
-                    .ToList();
 
-                ProprietariAttualmenteRegistrati = model.Persons
-                    .ToList();
-            }
-        }
 
         //Creiamo l'oggetto OggettoEntrata che conterrà i dati del parcheggio selezionato, e del Proprietario del veicolo con il relativo mezzo
-        public class OggettoEntrata
-        {
-            public string NomeParcheggioSelezionato { get; set; }
-            public string ColonnaSelezionata { get; set; }
-            public string RigaSelezionata { get; set; }
-            public Person Proprietario { get; set; }
-            public Vehicle Veicolo { get; set; }
-        }
+        
             
+    }
+    public class OggettoEntrata
+    {
+        public string NomeParcheggioSelezionato { get; set; }
+        public string ColonnaSelezionata { get; set; }
+        public string RigaSelezionata { get; set; }
+        public Person Proprietario { get; set; }
+        public Vehicle Veicolo { get; set; }
     }
 }
