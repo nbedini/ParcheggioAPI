@@ -5,7 +5,16 @@
 }
 
 <h1>Proprietario</h1>
-
+<div>
+    <a>
+        @Html.ActionLink(
+     "Modifica proprietario",// linkText
+     "ModificaProprietario",// actionName
+     "Proprietario",// controllerName
+     new {Model.Persona.CodiceFiscale}
+ )
+    </a>
+</div>
 <div>
     <hr />
     <dl class="row">
@@ -33,7 +42,7 @@
 <div>
     <h4>Veicoli</h4>
     <hr />
-    <table class="table table-bordered table-responsive table-hover">
+    <table class="table table-bordered  table-hover">
         <tr>
             <th>Targa</th>
             <th>Marca</th>

@@ -1,0 +1,52 @@
+﻿@model ParkingWeb.Model.Person
+
+@{
+    ViewData["Title"] = "ModificaProprietario";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Modifica Proprietario</h1>
+
+<h4>Person</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ModificaProprietario" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Nome" class="control-label"></label>
+                <input asp-for="Nome" class="form-control" />
+                <span asp-validation-for="Nome" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Cognome" class="control-label"></label>
+                <input asp-for="Cognome" class="form-control" />
+                <span asp-validation-for="Cognome" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DataNascita" class="control-label"></label>
+                <input asp-for="DataNascita" class="form-control" />
+                <span asp-validation-for="DataNascita" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="CodiceFiscale" />
+            <div class="form-group">
+                <input type="submit" formmethod="post" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a>
+        @Html.ActionLink(
+  "Ritorna alla visualizzazione normale del proprietario",// linkText
+  "Index",// actionName
+  "Proprietario",// controllerName
+  new { Model.CodiceFiscale }
+     )
+    </a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
