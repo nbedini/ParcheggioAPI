@@ -54,6 +54,7 @@ namespace ParcheggioAPI.Controllers
         [HttpPost("/api/Logout")]
         public ActionResult Logout()
         {
+            
             var username = HttpContext.User.Claims.FirstOrDefault(fod => fod.Type == "Username").Value;
             var id = Convert.ToInt32(HttpContext.User.Claims.FirstOrDefault(fod => fod.Type == "Id").Value);
             using (ParkingSystemContext model = new ParkingSystemContext())

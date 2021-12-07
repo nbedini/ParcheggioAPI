@@ -88,7 +88,6 @@ namespace ParcheggioAPI.Controllers
                 return Ok(TempoTrascorso.ToString());
             }
         }
-
         }
 
     public class OggettoEsciVeicolo
