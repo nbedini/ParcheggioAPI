@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Parcheggio.Views"
         mc:Ignorable="d"
-        Title="VisualizzaStorico" Height="450" Width="800" Icon="/Views/Icon.ico">
+        Title="VisualizzaStorico" Height="456" Width="800" Icon="/Views/Icon.ico">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="4.8"></RowDefinition>
@@ -14,9 +14,9 @@
         </Grid.RowDefinitions>
         <DockPanel Margin="5,2.2,4.6,2.2" Grid.Row="1">
             <!-- Datagrid -->
-            <DataGrid x:Name="Storico_Parcheggio" AutoGenerateColumns="False" CanUserDeleteRows="False" CanUserAddRows="False" IsReadOnly="True" Height="178" VerticalAlignment="Top" Width="766" Margin="0,0,0,-0.4">
+            <DataGrid SelectedItem="{Binding SelectedItem}" ItemsSource="{Binding ItemSource}" AutoGenerateColumns="False" CanUserDeleteRows="False" CanUserAddRows="False" IsReadOnly="True" Height="178" VerticalAlignment="Top" Width="766" Margin="0,0,0,-0.4">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Targa" Width="80" Binding="{Binding Targa}">
+                    <DataGridTextColumn Header="Targa" Width="120" Binding="{Binding Targa}">
 
                     </DataGridTextColumn>
 
@@ -28,9 +28,6 @@
 
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Header="Tempo Trascorso" Width="140" Binding="{Binding TempoTrascorso}">
-
-                    </DataGridTextColumn>
                     <DataGridTextColumn Header="X" Width="50" Binding="{Binding Riga}">
 
                     </DataGridTextColumn>
@@ -54,11 +51,9 @@
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
 
-                <TextBox CharacterCasing="Upper" Name="tb_RicercaTarga" MaxLength="7" Grid.Column="0" TextAlignment="Left" FontSize="15" Margin="10,76,142.2,100.6"/>
-                <Label Content="Cerca Targa" HorizontalAlignment="Left" Margin="10,34,0,0" FontSize="20" VerticalAlignment="Top" Width="134"/>
-                <Button Height="50" RenderTransformOrigin="-0.947,1.01" Margin="10,133,267.2,26.6" FontSize="20" FontWeight="Bold" Click="Cerca_Click">Cerca</Button>
-                <Button Height="50" RenderTransformOrigin="-0.947,1.01" Margin="156,133,121.2,26.6" FontSize="20" FontWeight="Bold" Click="Reset_Click" Content="Reset"/>
-                <Button Grid.Column="1" Height="100"  FontWeight="Bold" Click="Proprietario_Click" Margin="117.8,83,82.6,26.6" RenderTransformOrigin="0.512,1.119">Visualizza Proprietario</Button>
+                <TextBox CharacterCasing="Upper" TextChanged="TextBox_TextChanged" Text="{Binding CercareTarga,UpdateSourceTrigger=PropertyChanged}" MaxLength="7" Grid.Column="0" TextAlignment="Left" FontSize="15" Margin="10,136,142,40"/>
+                <Label Content="Cerca Targa" HorizontalAlignment="Left" Margin="10,96,0,0" FontSize="20" VerticalAlignment="Top" Width="134"/>
+                <Button Grid.Column="1" Height="100" FontSize="22"  FontWeight="Bold" Click="Proprietario_Click" Margin="63,86,63,35" RenderTransformOrigin="0.512,1.119">Visualizza Proprietario</Button>
             </Grid>
 
         </DockPanel>
