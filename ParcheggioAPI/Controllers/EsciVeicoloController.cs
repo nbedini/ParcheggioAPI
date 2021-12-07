@@ -5,12 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ParcheggioAPI.Models;
+using NLog;
 
 namespace ParcheggioAPI.Controllers
 {
     [ApiController]
     public class EsciVeicoloController : ControllerBase
     {
+        public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         [HttpDelete("/api/esciveicolo")]
         public ActionResult EsciVeicolo([FromBody] OggettoEsciVeicolo o)
         {
@@ -82,11 +84,10 @@ namespace ParcheggioAPI.Controllers
 
                     model.SaveChanges();
                 }
-                
+                logger.Log(LogLevel.Info, "Veicolo con targa {targa} uscito.", Veicolo.Targa);
                 return Ok(TempoTrascorso.ToString());
             }
         }
-
         }
 
     public class OggettoEsciVeicolo

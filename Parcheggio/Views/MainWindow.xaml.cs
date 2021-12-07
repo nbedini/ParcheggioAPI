@@ -50,6 +50,9 @@ namespace Parcheggio.Views
 
         public void Support()
         {
+            RegistrazioneLogin registrazioneLoginView = new RegistrazioneLogin();
+            registrazioneLoginView.ShowDialog();
+            AdminYesONo = registrazioneLoginView.AdminONo;
             MainMenu MenuView = new MainMenu(AdminYesONo);
             MenuView.ShowDialog();
             LogoutEffettuato = MenuView.LogoutEffettuato;
