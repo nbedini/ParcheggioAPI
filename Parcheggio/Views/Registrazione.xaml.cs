@@ -50,7 +50,6 @@ namespace Parcheggio.Views
                 
                 if (response.IsSuccessStatusCode)
                 {
-                    MessageBox.Show("Creazione utente andata a buon fine");
                     StatusChiusura = true;
                     this.Close();
                 }
