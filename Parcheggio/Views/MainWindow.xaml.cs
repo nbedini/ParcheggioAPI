@@ -17,6 +17,8 @@ namespace Parcheggio.Views
     {
         #region Properties
 
+        // Dichiarazione delle proprieta' e interfacce.
+
         public bool CambioParcheggio { get; set; } = false;
         public bool PrimoAvvio { get; set; } = false;
         public bool NienteRicarica { get; set; } = true;
@@ -62,8 +64,7 @@ namespace Parcheggio.Views
         public bool SwitchRegistrazioneLogin { get; set; } = false;
         public bool RegistrazioneEffettuata { get; set; } = false;
         public bool LoginChiusuraSenzaCompletamento { get; set; } = false;
-
-        HttpClient client = new HttpClient();
+        public HttpClient client { get; set; } = new HttpClient();
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -71,6 +72,13 @@ namespace Parcheggio.Views
 
         #region Costructor
 
+        #region Diverse Fasi
+
+        #region Fase Zero
+
+        /// <summary>
+        /// Metodo che apre a vista la finestra di login e alla chiusura popola delle variabili di questa classe con i suoi ex valori.
+        /// </summary>
         public void SupportParteZero()
         {
             Login LoginView = new Login();
@@ -82,14 +90,22 @@ namespace Parcheggio.Views
             SwitchLoginRegistrazione = LoginView.SwitchRegistrazione;
         }
 
+        #endregion
+
+        #region Fase Uno
+        /// <summary>
+        /// Metodo che permette di effettuare dei controlli e di aprire finestre diverse prima di mostrare quella che contiene.
+        /// </summary>
         public void SupportPrimaParte()
         {
             bool skip = false;
             while (LogoutEffettuato)
             {
+                // Chiamo il metodo della fase zero per far comparire come prima pagina quella di login.
                 SupportParteZero();
                 if (SwitchLoginRegistrazione)
                 {
+                    // Se l'utente invece di fare il login si deve registrare gli viene cambiata la pagina visualizzata in quella da registrazione.
                     Registrazione RegistrazioneView = new Registrazione();
                     RegistrazioneView.ShowDialog();
                     UserLoggato = RegistrazioneView.UsernameRegistrato;
@@ -97,6 +113,7 @@ namespace Parcheggio.Views
                     RegistrazioneEffettuata = RegistrazioneView.StatusChiusura;
                     if (RegistrazioneEffettuata)
                     {
+                        // Se l'utente si registra correttamente viene chiamato il metodo della fase due.
                         SupportSecondaParte();
                         skip = true;
                     }
@@ -113,12 +130,21 @@ namespace Parcheggio.Views
                 {
                     break;
                 }
+                // Se non e' stata chiamata la registrazione ma e' stato effettuato il login viene chiamata la parte due altrimenti viene saltata e si passa direttamente alla fase tre. 
                 if(!skip)
                     SupportSecondaParte();
             }
+            // Chiamo il metodo che rappresenta la fase tre.
             SupportTerzaParte();
         }
 
+        #endregion
+
+        #region Fase Due
+
+        /// <summary>
+        /// Metodo che apre a schermo una finestra di menu' e alla chiusura popola le variabili di questa classe.
+        /// </summary>
         public async Task SupportSecondaParte()
         {
             MainMenu MenuView = new MainMenu(AdminYesONo);
@@ -130,6 +156,13 @@ namespace Parcheggio.Views
             NomeParcheggioCreato = MenuView.NomeParcheggioCreato;
         }
 
+        #endregion
+
+        #region Fase Tre
+
+        /// <summary>
+        /// Metodo dell'ultima fase, quest'ultima controlla le variabili che sono state inserite in precedenza per effettuare determinate operazioni.
+        /// </summary
         public async Task SupportTerzaParte()
         {
             if (ParcheggioEsistenteMenu || ParcheggioNuovoMenu)
@@ -145,17 +178,22 @@ namespace Parcheggio.Views
                 InitializeComponent();
                 if (!AdminYesONo) itProprietari.Visibility = Visibility.Collapsed;
                 else itProprietari.Visibility = Visibility.Visible;
-                if(PrimoAvvio)
-                    await GenerazioneParcheggio(4,true);
-                else
-                    await GenerazioneParcheggio(1, false);
+                // Chiamate a un metodo asincrono che ottiene dall'API i dati e genera la visualizzazione del parcheggio.
+                if(PrimoAvvio) await GenerazioneParcheggio(4,true);
+                else await GenerazioneParcheggio(1, false);
                 this.DataContext = this;
 
             }
             else
+                // Comando per la chiusura dell'applicazione.
                 Application.Current.Shutdown();
         }
 
+        #endregion
+
+        #endregion
+
+        // Costruttore che chiama il metodo della fase uno.
         public MainWindow()
         {
             SupportPrimaParte();
@@ -165,11 +203,19 @@ namespace Parcheggio.Views
 
         #region Public Methods
 
+        /// <summary>
+        /// Metodo dell'interfaccia che inserito nel set di una variabile permette di aggiornare la view delle modifiche che ha subito quella variabile.
+        /// </summary>
+        /// <param name="propertyname"> Parametro che corrisponde al nome della proprieta' che deve controllare </param>
         public void OnPropertyChanged(string propertyname)
         {
             PropertyChanged.Invoke(this, new PropertyChangedEventArgs(propertyname));
         }
 
+        /// <summary>
+        /// Metodo che durante la creazione visiva del parcheggio viene associato a ogni bottone che rappresenta il parcheggio all'evento click.
+        /// </summary>
+        /// <param name="sender"> Corrisponde al bottone che e' stato premuto </param>
         public async void AllButtonClick(object sender, EventArgs e)
         {
             StatoParcheggio StatoParcheggioView = new StatoParcheggio(sender, NomeParcheggio);
@@ -179,24 +225,26 @@ namespace Parcheggio.Views
             ChiusuraStatoParcheggio = StatoParcheggioView.Chiusura;
             ChiusuraStatoParcheggioEsci = StatoParcheggioView.ChiusuraEsci;
             TargaStatoParcheggio = StatoParcheggioView.Targa;
-            if (ChiusuraStatoParcheggio)
-            {
-                await GenerazioneParcheggio(3,false,rigastatoparcheggio, colonnastatoparcheggio);
-            }
-            else if (ChiusuraStatoParcheggioEsci)
-            {
-                await GenerazioneParcheggio(2,false,rigastatoparcheggio,colonnastatoparcheggio);
-            }
+
+            // Chiamo il metodo che genera il parcheggio per aggiornare la vista da possibili inserimenti o rimozioni.
+            if (ChiusuraStatoParcheggio) await GenerazioneParcheggio(3,false,rigastatoparcheggio, colonnastatoparcheggio);
+            else if (ChiusuraStatoParcheggioEsci) await GenerazioneParcheggio(2,false,rigastatoparcheggio,colonnastatoparcheggio);
         }
 
         #endregion
 
         #region GenerazioneParcheggio usando API(int status, string rigaeliminata, string colonnaeliminata)
 
+        /// <summary>
+        /// Metodo che si occupa di contattare l'API e di generare il parcheggio dal lato grafico.
+        /// </summary>
+        /// Tutti i parametri in ingresso vengono mandati tramite chiamata http all'API.
         public async Task GenerazioneParcheggio(int status, bool cambioparcheggio, string rigaeliminata = "", string colonnaeliminata = "")
         {
             Grid grid = new Grid();
 
+            // Creo una richiesta di tipo POST e come body gli spedisco un oggetto di tipo DatiParcheggio.
+            // Dopo aver mandato la richiesta converto nel tipo di dato che mi interessa la stringa di risposta.
             HttpRequestMessage request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
@@ -215,6 +263,7 @@ namespace Parcheggio.Views
             var response = await client.SendAsync(request);
             var data = JsonConvert.DeserializeObject<ValoreRitornoParcheggioView>(await response.Content.ReadAsStringAsync());
 
+            // Imposto dei parametri per la griglia che visualizzara' il parcheggio.
             grid.Background = new SolidColorBrush(Colors.Gray);
             for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
             {
@@ -224,6 +273,7 @@ namespace Parcheggio.Views
             {
                 grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(120) });
             }
+            // Per ogni riga e colonna vado a inserirci un bottone.
             for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
             {
                 for (int j = 0; j < Convert.ToInt32(data.Colonne); j++)
@@ -233,6 +283,7 @@ namespace Parcheggio.Views
                     AreeParcheggio.Margin = new Thickness(2, 2, 0, 0);
                     AreeParcheggio.Background = new SolidColorBrush(Colors.LimeGreen);
                     AreeParcheggio.Click += new RoutedEventHandler(AllButtonClick);
+                    // Controllo per verificare se in quel determinato parcheggio e' presente un veicolo usando questo dizionario passatomi dall'API.
                     foreach (var v in data.keyValues)
                     {
                         if (AreeParcheggio.Name == $"Button{v.Key}")
@@ -248,13 +299,18 @@ namespace Parcheggio.Views
                     grid.Children.Add(AreeParcheggio);
                 }
             }
+            // Per finire importo questa griglia in quella presente nel file XAML.
             ParcheggioView.Children.Add(grid);
 
         }
 
             #endregion
 
-        #region menù
+        #region Menù
+
+        /// <summary>
+        /// Metodo che risponde alla premuta del tasto Menu' nella barra di navigazione.
+        /// </summary>
         private async void Ritorna_Menu(object sender, RoutedEventArgs e)
         {
             this.Hide();
@@ -263,41 +319,66 @@ namespace Parcheggio.Views
             await SupportTerzaParte();
             Aggiorna(new { }, new RoutedEventArgs());
             this.Show();
-            
         }
 
+        /// <summary>
+        /// Metodo che risponde alla premuta del tasto Veicoli Attuali nella barra di navigazione.
+        /// </summary>
         private void Stato_Completo(object sender, RoutedEventArgs e)
         {
             StatoCompleto sc = new StatoCompleto(NomeParcheggio);
             sc.ShowDialog();
         }
+
+        /// <summary>
+        /// Metodo che risponde alla premuta del tasto Storico nella barra di navigazione.
+        /// </summary>
         private void Storico(object sender, RoutedEventArgs e)
         {
             VisualizzaStorico vs = new VisualizzaStorico(NomeParcheggio);
             vs.ShowDialog();
         }
+
+        /// <summary>
+        /// Metodo che risponde alla premuta del tasto Incasso Storico nella barra di navigazione.
+        /// </summary>
         private void Incasso_Storico(object sender, RoutedEventArgs e)
         {
             IncassoStorico ig = new IncassoStorico(NomeParcheggio);
             ig.ShowDialog();
         }
+
+        /// <summary>
+        /// Metodo che risponde alla premuta del tasto Incasso Attuale nella barra di navigazione.
+        /// </summary>
         private void Incasso_Giornaliero(object sender, RoutedEventArgs e)
         {
             IncassoAttuale ig = new IncassoAttuale(NomeParcheggio);
             ig.ShowDialog();
         }
+
+        /// <summary>
+        /// Metodo che risponde alla premuta del tasto Aggiorna nella barra di navigazione.
+        /// </summary>
         private async void Aggiorna(object sender, RoutedEventArgs e)
         {
             GenerazioneParcheggio(4,false);
         }
+
+        /// <summary>
+        /// Metodo che risponde alla premuta del tasto Proprietari nella barra di navigazione, visibile solo a chi effettua il login come admin.
+        /// </summary>
         private void MenuItem_Click(object sender, RoutedEventArgs e)
         {
             ListaProprietari listaProprietariView = new ListaProprietari();
             listaProprietariView.ShowDialog();
         }
+
+        /// <summary>
+        /// Metodo che risponde alla premuta del tasto Logout nella barra di navigazione sotto il proprio nickname.
+        /// </summary>
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
-            
             MessageBoxResult result = MessageBox.Show("Sicuro di voler eseguire il logout ? ", "Conferma logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
             switch (result)
             {

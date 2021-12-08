@@ -18,7 +18,6 @@ namespace Parcheggio.Models
         public string Targa { get; set; }
         public System.DateTime DataOrarioEntrata { get; set; }
         public System.DateTime DataOrarioUscita { get; set; }
-        public System.TimeSpan TempoTrascorso { get; set; }
         public double Tariffa { get; set; }
         public string Riga { get; set; }
         public string Colonna { get; set; }
