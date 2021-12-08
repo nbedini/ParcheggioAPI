@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +19,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Newtonsoft.Json;
 using Parcheggio.Models;
+using Parcheggio.Properties;
 using ParcheggioAPI.Models;
 
 namespace Parcheggio.Views
@@ -25,9 +28,21 @@ namespace Parcheggio.Views
     {
         #region Properties
 
+        public bool CambioParcheggio { get; set; } = false;
         public bool PrimoAvvio { get; set; } = false;
         public bool NienteRicarica { get; set; } = true;
-        public string UserLoggato { get; set; }
+        private string userloggato;
+
+        public string UserLoggato
+        {
+            get { return userloggato; }
+            set 
+            { 
+                userloggato = value; 
+                if (PrimoAvvio) OnPropertyChanged("UserLoggato"); 
+            }
+        }
+
         public bool Status { get; set; } = false;
         public bool AdminYesONo { get; set; } 
         public string TargaStatoParcheggio { get; set; }
@@ -67,7 +82,52 @@ namespace Parcheggio.Views
 
         #region Costructor
 
-        public async Task SupportPrimaParte()
+        public void SupportParteZero()
+        {
+            Login LoginView = new Login();
+            LoginView.ShowDialog();
+            NienteRicarica = false;
+            UserLoggato = LoginView.UsernameLogin;
+            AdminYesONo = LoginView.Risposta;
+            LoginChiusuraSenzaCompletamento = LoginView.LoginEffettuatoChiusuraForm;
+            SwitchLoginRegistrazione = LoginView.SwitchRegistrazione;
+        }
+
+        public void SupportPrimaParte()
+        {
+            while (LogoutEffettuato)
+            {
+                SupportParteZero();
+                if (SwitchLoginRegistrazione)
+                {
+                    Registrazione RegistrazioneView = new Registrazione();
+                    RegistrazioneView.ShowDialog();
+                    UserLoggato = RegistrazioneView.UsernameRegistrato;
+                    SwitchRegistrazioneLogin = RegistrazioneView.SwitchLogin;
+                    RegistrazioneEffettuata = RegistrazioneView.StatusChiusura;
+                    if (RegistrazioneEffettuata)
+                    {
+                        SupportPrimaParte();
+                    }
+                    else if (SwitchRegistrazioneLogin)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+                else if (!LoginChiusuraSenzaCompletamento)
+                {
+                    break;
+                }
+                SupportSecondaParte();
+            }
+            SupportTerzaParte();
+        }
+
+        public async Task SupportSecondaParte()
         {
             MainMenu MenuView = new MainMenu(AdminYesONo);
             MenuView.ShowDialog();
@@ -78,7 +138,7 @@ namespace Parcheggio.Views
             NomeParcheggioCreato = MenuView.NomeParcheggioCreato;
         }
 
-        public async Task SupportSecondaParte()
+        public async Task SupportTerzaParte()
         {
             if (ParcheggioEsistenteMenu || ParcheggioNuovoMenu)
             {
@@ -106,42 +166,7 @@ namespace Parcheggio.Views
 
         public MainWindow()
         {
-            while (LogoutEffettuato)
-            {
-                Login LoginView = new Login();
-                LoginView.ShowDialog();
-                NienteRicarica = false;
-                UserLoggato = LoginView.UsernameLogin;
-                AdminYesONo = LoginView.Risposta;
-                LoginChiusuraSenzaCompletamento = LoginView.LoginEffettuatoChiusuraForm;
-                SwitchLoginRegistrazione = LoginView.SwitchRegistrazione;
-                if (SwitchLoginRegistrazione)
-                {
-                    Registrazione RegistrazioneView = new Registrazione();
-                    RegistrazioneView.ShowDialog();
-                    UserLoggato = RegistrazioneView.UsernameRegistrato;
-                    SwitchRegistrazioneLogin = RegistrazioneView.SwitchLogin;
-                    RegistrazioneEffettuata = RegistrazioneView.StatusChiusura;
-                    if (RegistrazioneEffettuata)
-                    {
-                        SupportPrimaParte();
-                    }
-                    else if (SwitchRegistrazioneLogin)
-                    {
-                        continue;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else if (!LoginChiusuraSenzaCompletamento)
-                {
-                    break;
-                }
-                SupportPrimaParte();
-            }
-            SupportSecondaParte();
+            SupportPrimaParte();
         }
 
         #endregion
@@ -242,8 +267,8 @@ namespace Parcheggio.Views
         {
             this.Hide();
             PrimoAvvio = true;
-            await SupportPrimaParte();
             await SupportSecondaParte();
+            await SupportTerzaParte();
             Aggiorna(new { }, new RoutedEventArgs());
             this.Show();
             
@@ -280,12 +305,13 @@ namespace Parcheggio.Views
         }
         private async void Logout_Click(object sender, RoutedEventArgs e)
         {
+            
             MessageBoxResult result = MessageBox.Show("Sicuro di voler eseguire il logout ? ", "Conferma logout", MessageBoxButton.YesNo, MessageBoxImage.Question);
             switch (result)
             {
                 case MessageBoxResult.Yes:
                     {
-                        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", Properties.Settings.Token);
+                        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", Settings.Token);
                         var request = new HttpRequestMessage
                         {
                             Method = HttpMethod.Post,
@@ -294,10 +320,13 @@ namespace Parcheggio.Views
                         };
                         var response = await client.SendAsync(request);
                         var risposta = await response.Content.ReadAsStringAsync();
-                        Properties.Settings.Token = "";
+                        Settings.Token = "";
+                        this.Hide();
+                        PrimoAvvio = true;
                         LogoutEffettuato = true;
-                        Application.Current.Shutdown();
-                        System.Diagnostics.Process.Start(Environment.GetCommandLineArgs()[0]);
+                        SupportPrimaParte();
+                        Aggiorna(new { }, new RoutedEventArgs());
+                        this.Show();
                         break;
                     }
                 case MessageBoxResult.No:
