@@ -33,5 +33,6 @@ namespace Parcheggio.Models
         public virtual DbSet<Person> Persons { get; set; }
         public virtual DbSet<sysdiagram> sysdiagrams { get; set; }
         public virtual DbSet<Vehicle> Vehicles { get; set; }
+        public virtual DbSet<User> Users { get; set; }
     }
 }

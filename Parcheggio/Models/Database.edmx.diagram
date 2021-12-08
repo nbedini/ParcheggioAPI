@@ -18,6 +18,9 @@
         <AssociationConnector Association="ParkingSystemModel.FK_ParkingHistorys_Persons" ManuallyRouted="false" />
         <AssociationConnector Association="ParkingSystemModel.FK_ParkingStatuss_Parkings" ManuallyRouted="false" />
         <AssociationConnector Association="ParkingSystemModel.FK_Vehicles_Persons" ManuallyRouted="false" />
+        <EntityTypeShape EntityType="ParkingSystemModel.User" Width="1.5" PointX="8.375" PointY="7.75" />
+        <AssociationConnector Association="ParkingSystemModel.FK_ParkingHistorys_Parkings" />
+        <AssociationConnector Association="ParkingSystemModel.FK_ParkingHistorys_Vehicles" />
       </Diagram>
     </edmx:Diagrams>
   </edmx:Designer>

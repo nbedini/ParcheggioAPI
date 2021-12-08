@@ -19,6 +19,7 @@ namespace Parcheggio.Models
         {
             this.ParkingAmounts = new HashSet<ParkingAmount>();
             this.ParkingStatusses = new HashSet<ParkingStatuss>();
+            this.ParkingHistorys = new HashSet<ParkingHistory>();
         }
     
         public string Righe { get; set; }
@@ -29,5 +30,7 @@ namespace Parcheggio.Models
         public virtual ICollection<ParkingAmount> ParkingAmounts { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ParkingStatuss> ParkingStatusses { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ParkingHistory> ParkingHistorys { get; set; }
     }
 }

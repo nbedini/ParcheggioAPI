@@ -4,10 +4,14 @@
   <edmx:Runtime>
     <!-- SSDL content -->
     <edmx:StorageModels>
-      <Schema Namespace="ParkingSystemModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+    <Schema Namespace="ParkingSystemModel.Store" Provider="System.Data.SqlClient" ProviderManifestToken="2012" Alias="Self" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm/ssdl">
+        <!--Errori trovati durante la generazione:
+avviso 6002: Nessuna chiave primaria definita per la tabella/visualizzazione 'ParkingSystem.dbo.ParkingAmounts'. La chiave è stata dedotta e la definizione è stata creata come tabella/visualizzazione di sola lettura.-->
         <EntityType Name="ParkingAmounts">
           <Key>
             <PropertyRef Name="Giorno" />
+            
+            
           </Key>
           <Property Name="Giorno" Type="datetime" Nullable="false" />
           <Property Name="IncassoTotale" Type="varchar" MaxLength="50" Nullable="false" />
@@ -28,7 +32,6 @@
           <Property Name="Targa" Type="varchar" MaxLength="7" Nullable="false" />
           <Property Name="DataOrarioEntrata" Type="datetime" Nullable="false" />
           <Property Name="DataOrarioUscita" Type="datetime" Nullable="false" />
-          <Property Name="TempoTrascorso" Type="time" Precision="7" Nullable="false" />
           <Property Name="Tariffa" Type="float" Nullable="false" />
           <Property Name="Riga" Type="varchar" MaxLength="2" Nullable="false" />
           <Property Name="Colonna" Type="varchar" MaxLength="2" Nullable="false" />
@@ -74,6 +77,14 @@
           <Property Name="version" Type="int" />
           <Property Name="definition" Type="varbinary(max)" />
         </EntityType>
+        <EntityType Name="Users">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="bigint" StoreGeneratedPattern="Identity" Nullable="false" />
+          <Property Name="Username" Type="varchar" MaxLength="100" Nullable="false" />
+          <Property Name="Password" Type="varchar" MaxLength="255" Nullable="false" />
+        </EntityType>
         <EntityType Name="Vehicles">
           <Key>
             <PropertyRef Name="Targa" />
@@ -108,6 +119,18 @@
             </Dependent>
           </ReferentialConstraint>
         </Association>
+        <Association Name="FK_ParkingHistorys_Parkings">
+          <End Role="Parkings" Type="Self.Parkings" Multiplicity="1" />
+          <End Role="ParkingHistorys" Type="Self.ParkingHistorys" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Parkings">
+              <PropertyRef Name="NomeParcheggio" />
+            </Principal>
+            <Dependent Role="ParkingHistorys">
+              <PropertyRef Name="NomeParcheggio" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
         <Association Name="FK_ParkingHistorys_Persons">
           <End Role="Persons" Type="Self.Persons" Multiplicity="1" />
           <End Role="ParkingHistorys" Type="Self.ParkingHistorys" Multiplicity="*" />
@@ -117,6 +140,18 @@
             </Principal>
             <Dependent Role="ParkingHistorys">
               <PropertyRef Name="Propietario" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParkingHistorys_Vehicles">
+          <End Role="Vehicles" Type="Self.Vehicles" Multiplicity="1" />
+          <End Role="ParkingHistorys" Type="Self.ParkingHistorys" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vehicles">
+              <PropertyRef Name="Targa" />
+            </Principal>
+            <Dependent Role="ParkingHistorys">
+              <PropertyRef Name="Targa" />
             </Dependent>
           </ReferentialConstraint>
         </Association>
@@ -145,14 +180,21 @@
           </ReferentialConstraint>
         </Association>
         <EntityContainer Name="ParkingSystemModelStoreContainer">
-          <EntitySet Name="ParkingAmounts" EntityType="Self.ParkingAmounts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ParkingCosts" EntityType="Self.ParkingCosts" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ParkingHistorys" EntityType="Self.ParkingHistorys" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Parkings" EntityType="Self.Parkings" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="ParkingStatuss" EntityType="Self.ParkingStatuss" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Persons" EntityType="Self.Persons" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="sysdiagrams" EntityType="Self.sysdiagrams" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="Users" EntityType="Self.Users" Schema="dbo" store:Type="Tables" />
           <EntitySet Name="Vehicles" EntityType="Self.Vehicles" Schema="dbo" store:Type="Tables" />
+          <EntitySet Name="ParkingAmounts" EntityType="Self.ParkingAmounts" store:Type="Tables" store:Schema="dbo">
+            <DefiningQuery>SELECT 
+    [ParkingAmounts].[Giorno] AS [Giorno], 
+    [ParkingAmounts].[IncassoTotale] AS [IncassoTotale], 
+    [ParkingAmounts].[NomeParcheggio] AS [NomeParcheggio]
+    FROM [dbo].[ParkingAmounts] AS [ParkingAmounts]</DefiningQuery>
+          </EntitySet>
           <AssociationSet Name="FK_ParkingAmounts_Parkings" Association="Self.FK_ParkingAmounts_Parkings">
             <End Role="Parkings" EntitySet="Parkings" />
             <End Role="ParkingAmounts" EntitySet="ParkingAmounts" />
@@ -161,8 +203,16 @@
             <End Role="ParkingCosts" EntitySet="ParkingCosts" />
             <End Role="ParkingHistorys" EntitySet="ParkingHistorys" />
           </AssociationSet>
+          <AssociationSet Name="FK_ParkingHistorys_Parkings" Association="Self.FK_ParkingHistorys_Parkings">
+            <End Role="Parkings" EntitySet="Parkings" />
+            <End Role="ParkingHistorys" EntitySet="ParkingHistorys" />
+          </AssociationSet>
           <AssociationSet Name="FK_ParkingHistorys_Persons" Association="Self.FK_ParkingHistorys_Persons">
             <End Role="Persons" EntitySet="Persons" />
+            <End Role="ParkingHistorys" EntitySet="ParkingHistorys" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParkingHistorys_Vehicles" Association="Self.FK_ParkingHistorys_Vehicles">
+            <End Role="Vehicles" EntitySet="Vehicles" />
             <End Role="ParkingHistorys" EntitySet="ParkingHistorys" />
           </AssociationSet>
           <AssociationSet Name="FK_ParkingStatuss_Parkings" Association="Self.FK_ParkingStatuss_Parkings">
@@ -174,8 +224,7 @@
             <End Role="Vehicles" EntitySet="Vehicles" />
           </AssociationSet>
         </EntityContainer>
-      </Schema>
-    </edmx:StorageModels>
+      </Schema></edmx:StorageModels>
     <!-- CSDL content -->
     <edmx:ConceptualModels>
       <Schema Namespace="ParkingSystemModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
@@ -213,6 +262,8 @@
           <Property Name="Propietario" Type="String" MaxLength="16" FixedLength="true" Unicode="false" Nullable="false" />
           <NavigationProperty Name="ParkingCost" Relationship="Self.FK_ParkingHistorys_ParkingCosts" FromRole="ParkingHistorys" ToRole="ParkingCosts" />
           <NavigationProperty Name="Person" Relationship="Self.FK_ParkingHistorys_Persons" FromRole="ParkingHistorys" ToRole="Persons" />
+          <NavigationProperty Name="Parking" Relationship="ParkingSystemModel.FK_ParkingHistorys_Parkings" FromRole="ParkingHistory" ToRole="Parking" />
+          <NavigationProperty Name="Vehicle" Relationship="ParkingSystemModel.FK_ParkingHistorys_Vehicles" FromRole="ParkingHistory" ToRole="Vehicle" />
         </EntityType>
         <EntityType Name="Parking">
           <Key>
@@ -223,6 +274,7 @@
           <Property Name="NomeParcheggio" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="ParkingAmounts" Relationship="Self.FK_ParkingAmounts_Parkings" FromRole="Parkings" ToRole="ParkingAmounts" />
           <NavigationProperty Name="ParkingStatusses" Relationship="Self.FK_ParkingStatuss_Parkings" FromRole="Parkings" ToRole="ParkingStatuss" />
+          <NavigationProperty Name="ParkingHistorys" Relationship="ParkingSystemModel.FK_ParkingHistorys_Parkings" FromRole="Parking" ToRole="ParkingHistory" />
         </EntityType>
         <EntityType Name="ParkingStatuss">
           <Key>
@@ -267,6 +319,7 @@
           <Property Name="Propietario" Type="String" MaxLength="16" FixedLength="true" Unicode="false" Nullable="false" />
           <Property Name="TipoVeicolo" Type="String" MaxLength="200" FixedLength="false" Unicode="false" Nullable="false" />
           <NavigationProperty Name="Person" Relationship="Self.FK_Vehicles_Persons" FromRole="Vehicles" ToRole="Persons" />
+          <NavigationProperty Name="ParkingHistorys" Relationship="ParkingSystemModel.FK_ParkingHistorys_Vehicles" FromRole="Vehicle" ToRole="ParkingHistory" />
         </EntityType>
         <Association Name="FK_ParkingAmounts_Parkings">
           <End Role="Parkings" Type="Self.Parking" Multiplicity="1" />
@@ -357,7 +410,48 @@
             <End Role="Persons" EntitySet="Persons" />
             <End Role="Vehicles" EntitySet="Vehicles" />
           </AssociationSet>
+          <EntitySet Name="Users" EntityType="ParkingSystemModel.User" />
+          <AssociationSet Name="FK_ParkingHistorys_Parkings" Association="ParkingSystemModel.FK_ParkingHistorys_Parkings">
+            <End Role="Parking" EntitySet="Parkings" />
+            <End Role="ParkingHistory" EntitySet="ParkingHistorys" />
+          </AssociationSet>
+          <AssociationSet Name="FK_ParkingHistorys_Vehicles" Association="ParkingSystemModel.FK_ParkingHistorys_Vehicles">
+            <End Role="Vehicle" EntitySet="Vehicles" />
+            <End Role="ParkingHistory" EntitySet="ParkingHistorys" />
+          </AssociationSet>
         </EntityContainer>
+        <EntityType Name="User">
+          <Key>
+            <PropertyRef Name="Id" />
+          </Key>
+          <Property Name="Id" Type="Int64" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+          <Property Name="Username" Type="String" Nullable="false" MaxLength="100" FixedLength="false" Unicode="false" />
+          <Property Name="Password" Type="String" Nullable="false" MaxLength="255" FixedLength="false" Unicode="false" />
+        </EntityType>
+        <Association Name="FK_ParkingHistorys_Parkings">
+          <End Type="ParkingSystemModel.Parking" Role="Parking" Multiplicity="1" />
+          <End Type="ParkingSystemModel.ParkingHistory" Role="ParkingHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Parking">
+              <PropertyRef Name="NomeParcheggio" />
+            </Principal>
+            <Dependent Role="ParkingHistory">
+              <PropertyRef Name="NomeParcheggio" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
+        <Association Name="FK_ParkingHistorys_Vehicles">
+          <End Type="ParkingSystemModel.Vehicle" Role="Vehicle" Multiplicity="1" />
+          <End Type="ParkingSystemModel.ParkingHistory" Role="ParkingHistory" Multiplicity="*" />
+          <ReferentialConstraint>
+            <Principal Role="Vehicle">
+              <PropertyRef Name="Targa" />
+            </Principal>
+            <Dependent Role="ParkingHistory">
+              <PropertyRef Name="Targa" />
+            </Dependent>
+          </ReferentialConstraint>
+        </Association>
       </Schema>
     </edmx:ConceptualModels>
     <!-- C-S mapping content -->
@@ -388,7 +482,6 @@
                 <ScalarProperty Name="Targa" ColumnName="Targa" />
                 <ScalarProperty Name="DataOrarioEntrata" ColumnName="DataOrarioEntrata" />
                 <ScalarProperty Name="DataOrarioUscita" ColumnName="DataOrarioUscita" />
-                <ScalarProperty Name="TempoTrascorso" ColumnName="TempoTrascorso" />
                 <ScalarProperty Name="Tariffa" ColumnName="Tariffa" />
                 <ScalarProperty Name="Riga" ColumnName="Riga" />
                 <ScalarProperty Name="Colonna" ColumnName="Colonna" />
@@ -448,6 +541,15 @@
                 <ScalarProperty Name="Targa" ColumnName="Targa" />
                 <ScalarProperty Name="Propietario" ColumnName="Propietario" />
                 <ScalarProperty Name="TipoVeicolo" ColumnName="TipoVeicolo" />
+              </MappingFragment>
+            </EntityTypeMapping>
+          </EntitySetMapping>
+          <EntitySetMapping Name="Users">
+            <EntityTypeMapping TypeName="ParkingSystemModel.User">
+              <MappingFragment StoreEntitySet="Users">
+                <ScalarProperty Name="Password" ColumnName="Password" />
+                <ScalarProperty Name="Username" ColumnName="Username" />
+                <ScalarProperty Name="Id" ColumnName="Id" />
               </MappingFragment>
             </EntityTypeMapping>
           </EntitySetMapping>

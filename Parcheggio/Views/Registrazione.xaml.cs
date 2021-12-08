@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using ParcheggioAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using Parcheggio.Models;
 
 namespace Parcheggio.Views
 {
@@ -31,6 +32,7 @@ namespace Parcheggio.Views
         public Registrazione()
         {
             InitializeComponent();
+            this.DataContext = this;
         }
 
         private async void SubmitClick(object sender, RoutedEventArgs e)
@@ -38,7 +40,7 @@ namespace Parcheggio.Views
             string password = tbPassword.Password;
             if (password.Length > 5)
             {
-                object candidato = new { username = UsernameForm, password = password };
+                object candidato = new User { Password = password , Username = UsernameForm};
                 var request = new HttpRequestMessage
                 {
                     Method = HttpMethod.Post,

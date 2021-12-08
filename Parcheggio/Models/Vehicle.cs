@@ -14,6 +14,12 @@ namespace Parcheggio.Models
     
     public partial class Vehicle
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2214:DoNotCallOverridableMethodsInConstructors")]
+        public Vehicle()
+        {
+            this.ParkingHistorys = new HashSet<ParkingHistory>();
+        }
+    
         public string Marca { get; set; }
         public string Modello { get; set; }
         public string Targa { get; set; }
@@ -21,5 +27,7 @@ namespace Parcheggio.Models
         public string TipoVeicolo { get; set; }
     
         public virtual Person Person { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<ParkingHistory> ParkingHistorys { get; set; }
     }
 }
