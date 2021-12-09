@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NLog;
 using ParcheggioAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,11 @@ using System.Threading.Tasks;
 
 namespace ParcheggioAPI.Controllers
 {
+    
     [ApiController]
     public class OttieniTargaController : ControllerBase
     {
+        public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         [HttpGet("/api/ottienitarga/{riga}/{colonna}/{nomeParcheggio}")]
         public ActionResult OttenimentoTarga(string riga, string colonna, string nomeParcheggio)
         {

@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NLog;
 using ParcheggioAPI.Models;
 using System.Linq;
 
 namespace ParcheggioAPI.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class StoricoPacheggioController : ControllerBase
     {
+        public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         [HttpGet("/api/storicoparcheggio/{nomeParcheggio}")]
         public ActionResult StoricoParcheggio(string nomeParcheggio)
         {
