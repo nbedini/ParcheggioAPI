@@ -1,0 +1,35 @@
+﻿@model ParkingWeb.Models.IncassiGornalieri
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<form method="get" asp-action="Index">
+    <p style="position:relative; left:635px">
+        <input type="search" placeholder="Cerca per Nome Parcheggio" value="@ViewData["NomeParcheggioDetails"]" name="searchName" style="width:225px" />
+        <input type="submit" value="Search" class="btn btn-light" />
+        <a asp-action="Index">Lista di tutti gli Incassi</a>
+    </p>
+</form>
+
+<div>
+    <h4>INCASSI</h4>
+    <hr />
+    <table class="table table-light table-bordered" style="width:100%">
+        <tr>
+            <th>Targa</th>
+            <th>Nome del Parcheggio</th>
+            <th>Incasso</th>
+
+        </tr>
+        @foreach (var d in Model.Incassi)
+        {
+            <tr>
+                <td>@d.Giorno</td>
+                <td>@d.NomeParcheggio</td>
+                <td>@d.IncassoTotale</td>
+            </tr>
+        }
+    </table>
+
+</div>
