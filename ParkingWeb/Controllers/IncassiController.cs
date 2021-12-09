@@ -22,7 +22,7 @@ namespace ParkingWeb.Controllers
                 listaIncassi.Incassi = model.ParkingAmounts.ToList();
                 if (!String.IsNullOrEmpty(searchName))
                 {
-                    listaIncassi.Incassi = listaIncassi.Incassi.Where(w => w.NomeParcheggio.Contains(searchName)).ToList();
+                    listaIncassi.Incassi = listaIncassi.Incassi.Where(w => w.NomeParcheggio.ToLower().Contains(searchName.ToLower())).ToList();
                 }
             
                 return View(listaIncassi);

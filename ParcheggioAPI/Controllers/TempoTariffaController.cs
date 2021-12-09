@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using NLog;
 using ParcheggioAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -10,9 +12,11 @@ using System.Threading.Tasks;
 
 namespace ParcheggioAPI.Controllers
 {
+    
     [ApiController]
     public class TempoTariffaController : ControllerBase
     {
+        public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         [HttpGet("/api/IncassoAttuale")]
         public ActionResult GetIncassoGiornaliero()
         {

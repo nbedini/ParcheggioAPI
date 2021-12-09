@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using NLog;
 using ParcheggioAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -8,9 +9,11 @@ using System.Threading.Tasks;
 
 namespace ParcheggioAPI.Controllers
 {
+
     [ApiController]
     public class InserimentoVeicoloController : Controller
     {
+        public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         //Liste di dati Contenuti nel DB
         public List<ParkingStatuss> VeicoliAttualmenteParcheggiati { get; set; }
 
@@ -47,6 +50,7 @@ namespace ParcheggioAPI.Controllers
                     {
                         if (p.Targa == o.Veicolo.Targa)
                         {
+                            logger.Log(LogLevel.Error, "Tentato inserimento di una macchina già presente nel parcheggio.");
                             return Problem("Impossibile inserire due volte la stessa targa nel parcheggio");
                         }
                     }
@@ -71,7 +75,7 @@ namespace ParcheggioAPI.Controllers
                                     .Add(new ParkingStatuss { Targa = o.Veicolo.Targa, Riga = o.RigaSelezionata, Colonna = o.ColonnaSelezionata, DataOrarioEntrata = DateTime.Now, NomeParcheggio = o.NomeParcheggioSelezionato, TipoVeicolo = o.Veicolo.TipoVeicolo });
                                 model.SaveChanges();
                             }
-
+                            logger.Log(LogLevel.Info, "Macchina con targa {targa} inserita correttamente", o.Veicolo.Targa);
                             return Ok();
                         }
                     }
@@ -86,12 +90,14 @@ namespace ParcheggioAPI.Controllers
                     model.ParkingStatusses
                             .Add(new ParkingStatuss { Targa = o.Veicolo.Targa, Riga = o.RigaSelezionata, Colonna = o.ColonnaSelezionata, DataOrarioEntrata = DateTime.Now, NomeParcheggio = o.NomeParcheggioSelezionato, TipoVeicolo = o.Veicolo.TipoVeicolo });
                     model.SaveChanges();
-
+                    logger.Log(LogLevel.Info, "Macchina con targa {targa} inserita correttamente",o.Veicolo.Targa);
+                    
                     return Ok();
                 }
             }
             else
             {
+                logger.Log(LogLevel.Error, "Problema nell'inserimento di una macchina.");
                 return Problem("Non sono stati inseriti i dati in modo corretto");
             }
         }

@@ -24,6 +24,7 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class Login : Window
     {
+        public bool LoginCompletato { get; set; } = false;
         public string UsernameForm { get; set; }
         public string UsernameLogin { get; set; }
         public bool SwitchRegistrazione { get; set; } = false;
@@ -63,6 +64,7 @@ namespace Parcheggio.Views
                 var risposta = await response2.Content.ReadAsStringAsync();
                 Risposta = Boolean.Parse(risposta);
                 LoginEffettuatoChiusuraForm = true;
+                LoginCompletato = true;
                 this.Close();
             }
             else
