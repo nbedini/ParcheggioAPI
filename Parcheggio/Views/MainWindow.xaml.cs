@@ -19,6 +19,7 @@ namespace Parcheggio.Views
 
         // Dichiarazione delle proprieta' e interfacce.
 
+        public bool LoginCompletato { get; set; } = true;
         public bool CambioParcheggio { get; set; } = false;
         public bool PrimoAvvio { get; set; } = false;
         public bool NienteRicarica { get; set; } = true;
@@ -74,35 +75,20 @@ namespace Parcheggio.Views
 
         #region Diverse Fasi
 
-        #region Fase Zero
-
-        /// <summary>
-        /// Metodo che apre a vista la finestra di login e alla chiusura popola delle variabili di questa classe con i suoi ex valori.
-        /// </summary>
-        public void SupportParteZero()
-        {
-            Login LoginView = new Login();
-            LoginView.ShowDialog();
-            NienteRicarica = false;
-            UserLoggato = LoginView.UsernameLogin;
-            AdminYesONo = LoginView.Risposta;
-            LoginChiusuraSenzaCompletamento = LoginView.LoginEffettuatoChiusuraForm;
-            SwitchLoginRegistrazione = LoginView.SwitchRegistrazione;
-        }
-
-        #endregion
-
-        #region Fase Uno
-        /// <summary>
-        /// Metodo che permette di effettuare dei controlli e di aprire finestre diverse prima di mostrare quella che contiene.
-        /// </summary>
         public void SupportPrimaParte()
         {
-            bool skip = false;
             while (LogoutEffettuato)
             {
                 // Chiamo il metodo della fase zero per far comparire come prima pagina quella di login.
-                SupportParteZero();
+                Login LoginView = new Login();
+                LoginView.ShowDialog();
+                LoginCompletato = LoginView.LoginCompletato;
+                NienteRicarica = false;
+                UserLoggato = LoginView.UsernameLogin;
+                AdminYesONo = LoginView.Risposta;
+                LoginChiusuraSenzaCompletamento = LoginView.LoginEffettuatoChiusuraForm;
+                SwitchLoginRegistrazione = LoginView.SwitchRegistrazione;
+                LogoutEffettuato = false;
                 if (SwitchLoginRegistrazione)
                 {
                     // Se l'utente invece di fare il login si deve registrare gli viene cambiata la pagina visualizzata in quella da registrazione.
@@ -110,14 +96,8 @@ namespace Parcheggio.Views
                     RegistrazioneView.ShowDialog();
                     UserLoggato = RegistrazioneView.UsernameRegistrato;
                     SwitchRegistrazioneLogin = RegistrazioneView.SwitchLogin;
-                    RegistrazioneEffettuata = RegistrazioneView.StatusChiusura;
-                    if (RegistrazioneEffettuata)
-                    {
-                        // Se l'utente si registra correttamente viene chiamato il metodo della fase due.
-                        SupportSecondaParte();
-                        skip = true;
-                    }
-                    else if (SwitchRegistrazioneLogin)
+                    LoginCompletato = RegistrazioneView.StatusChiusura;
+                    if (SwitchRegistrazioneLogin)
                     {
                         continue;
                     }
@@ -130,30 +110,8 @@ namespace Parcheggio.Views
                 {
                     break;
                 }
-                // Se non e' stata chiamata la registrazione ma e' stato effettuato il login viene chiamata la parte due altrimenti viene saltata e si passa direttamente alla fase tre. 
-                if(!skip)
-                    SupportSecondaParte();
             }
-            // Chiamo il metodo che rappresenta la fase tre.
             SupportTerzaParte();
-        }
-
-        #endregion
-
-        #region Fase Due
-
-        /// <summary>
-        /// Metodo che apre a schermo una finestra di menu' e alla chiusura popola le variabili di questa classe.
-        /// </summary>
-        public async Task SupportSecondaParte()
-        {
-            MainMenu MenuView = new MainMenu(AdminYesONo);
-            MenuView.ShowDialog();
-            LogoutEffettuato = MenuView.LogoutEffettuato;
-            ParcheggioEsistenteScelto = MenuView.ParcheggioScelto;
-            ParcheggioEsistenteMenu = MenuView.ParcheggioEsistenteProp;
-            ParcheggioNuovoMenu = MenuView.ParcheggioNuovo;
-            NomeParcheggioCreato = MenuView.NomeParcheggioCreato;
         }
 
         #endregion
@@ -165,28 +123,14 @@ namespace Parcheggio.Views
         /// </summary
         public async Task SupportTerzaParte()
         {
-            if (ParcheggioEsistenteMenu || ParcheggioNuovoMenu)
-            {
-                if (ParcheggioEsistenteMenu)
-                {
-                    NomeParcheggio = ParcheggioEsistenteScelto;
-                }
-                else if (ParcheggioNuovoMenu)
-                {
-                    NomeParcheggio = NomeParcheggioCreato;
-                }
-                InitializeComponent();
-                if (!AdminYesONo) itProprietari.Visibility = Visibility.Collapsed;
-                else itProprietari.Visibility = Visibility.Visible;
-                // Chiamate a un metodo asincrono che ottiene dall'API i dati e genera la visualizzazione del parcheggio.
-                if(PrimoAvvio) await GenerazioneParcheggio(4,true);
-                else await GenerazioneParcheggio(1, false);
-                this.DataContext = this;
-
-            }
-            else
-                // Comando per la chiusura dell'applicazione.
-                Application.Current.Shutdown();
+            InitializeComponent();
+            if (!AdminYesONo) itProprietari.Visibility = Visibility.Collapsed;
+            else itProprietari.Visibility = Visibility.Visible;
+            // Chiamate a un metodo asincrono che ottiene dall'API i dati e genera la visualizzazione del parcheggio.
+            if (PrimoAvvio) await GenerazioneParcheggio(4, true, LoginCompletato);
+            else await GenerazioneParcheggio(1, false, LoginCompletato);
+            LoginCompletato = false;
+            this.DataContext = this;
         }
 
         #endregion
@@ -198,8 +142,6 @@ namespace Parcheggio.Views
         {
             SupportPrimaParte();
         }
-
-        #endregion
 
         #region Public Methods
 
@@ -227,8 +169,39 @@ namespace Parcheggio.Views
             TargaStatoParcheggio = StatoParcheggioView.Targa;
 
             // Chiamo il metodo che genera il parcheggio per aggiornare la vista da possibili inserimenti o rimozioni.
-            if (ChiusuraStatoParcheggio) await GenerazioneParcheggio(3,false,rigastatoparcheggio, colonnastatoparcheggio);
-            else if (ChiusuraStatoParcheggioEsci) await GenerazioneParcheggio(2,false,rigastatoparcheggio,colonnastatoparcheggio);
+            if (ChiusuraStatoParcheggio) await GenerazioneParcheggio(3, false, LoginCompletato, rigastatoparcheggio, colonnastatoparcheggio);
+            else if (ChiusuraStatoParcheggioEsci) await GenerazioneParcheggio(2, false, LoginCompletato, rigastatoparcheggio, colonnastatoparcheggio);
+        }
+
+        public async void NuovoParcheggioClick(object sender, EventArgs e)
+        {
+            this.Hide();
+            bool ParcheggioCreato = false;
+            NuovoParcheggio nuovoParcheggioView = new NuovoParcheggio();
+            nuovoParcheggioView.ShowDialog();
+            NomeParcheggioCreato = nuovoParcheggioView.NomeParcheggio;
+            ParcheggioCreato = nuovoParcheggioView.ParcheggioCreato;
+            LoginCompletato = false;
+            PrimoAvvio = true;
+            NomeParcheggio = NomeParcheggioCreato;
+            ParcheggioNuovoMenu = true;
+            await GenerazioneParcheggio(1, false, LoginCompletato);
+            this.Show();
+        }
+        public async void ParcheggioEsistenteClick(object sender, EventArgs e)
+        {
+            this.Hide();
+            bool ParcheggioSelezionato = false;
+            ParcheggioEsistente parcheggioEsistenteView = new ParcheggioEsistente(AdminYesONo);
+            parcheggioEsistenteView.ShowDialog();
+            ParcheggioEsistenteScelto = parcheggioEsistenteView.NomeParcheggioSelezionato;
+            ParcheggioSelezionato = parcheggioEsistenteView.ParcheggioSelezionato;
+            LoginCompletato = false;
+            PrimoAvvio = true;
+            NomeParcheggio = ParcheggioEsistenteScelto;
+            ParcheggioEsistenteMenu = true;
+            await GenerazioneParcheggio(1, false, LoginCompletato);
+            this.Show();
         }
 
         #endregion
@@ -239,72 +212,111 @@ namespace Parcheggio.Views
         /// Metodo che si occupa di contattare l'API e di generare il parcheggio dal lato grafico.
         /// </summary>
         /// Tutti i parametri in ingresso vengono mandati tramite chiamata http all'API.
-        public async Task GenerazioneParcheggio(int status, bool cambioparcheggio, string rigaeliminata = "", string colonnaeliminata = "")
+        public async Task GenerazioneParcheggio(int status, bool cambioparcheggio,bool logineffettuato, string rigaeliminata = "", string colonnaeliminata = "")
         {
             Grid grid = new Grid();
-
-            // Creo una richiesta di tipo POST e come body gli spedisco un oggetto di tipo DatiParcheggio.
-            // Dopo aver mandato la richiesta converto nel tipo di dato che mi interessa la stringa di risposta.
-            HttpRequestMessage request = new HttpRequestMessage
+            Grid grid1 = new Grid();
+            if (!logineffettuato)
             {
-                Method = HttpMethod.Post,
-                RequestUri = new Uri("http://localhost:31329/api/parcheggioview"),
-                Content = new StringContent(JsonConvert.SerializeObject(new DatiParcheggio
+                // Creo una richiesta di tipo POST e come body gli spedisco un oggetto di tipo DatiParcheggio.
+                // Dopo aver mandato la richiesta converto nel tipo di dato che mi interessa la stringa di risposta.
+                HttpRequestMessage request = new HttpRequestMessage
                 {
-                    NomeParcheggio = NomeParcheggio,
-                    Status = status,
-                    rigaeliminata = rigaeliminata,
-                    colonnaeliminata = colonnaeliminata,
-                    ParcheggioEsistenteMenu = this.ParcheggioEsistenteMenu,
-                    ParcheggioNuovoMenu = this.ParcheggioNuovoMenu,
-                    CambioParcheggio = cambioparcheggio
-                }), Encoding.UTF8, "application/json")
-            };
-            var response = await client.SendAsync(request);
-            var data = JsonConvert.DeserializeObject<ValoreRitornoParcheggioView>(await response.Content.ReadAsStringAsync());
-
-            // Imposto dei parametri per la griglia che visualizzara' il parcheggio.
-            grid.Background = new SolidColorBrush(Colors.Gray);
-            for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
-            {
-                grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
-            }
-            for (int k = 0; k < Convert.ToInt32(data.Colonne); k++)
-            {
-                grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(120) });
-            }
-            // Per ogni riga e colonna vado a inserirci un bottone.
-            for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
-            {
-                for (int j = 0; j < Convert.ToInt32(data.Colonne); j++)
-                {
-                    Button AreeParcheggio = new Button();
-                    AreeParcheggio.Name = "Button" + data.rigacompleta[k * Convert.ToInt32(data.Colonne)] + data.colonnacompleta[j];
-                    AreeParcheggio.Margin = new Thickness(2, 2, 0, 0);
-                    AreeParcheggio.Background = new SolidColorBrush(Colors.LimeGreen);
-                    AreeParcheggio.Click += new RoutedEventHandler(AllButtonClick);
-                    // Controllo per verificare se in quel determinato parcheggio e' presente un veicolo usando questo dizionario passatomi dall'API.
-                    foreach (var v in data.keyValues)
+                    Method = HttpMethod.Post,
+                    RequestUri = new Uri("http://localhost:31329/api/parcheggioview"),
+                    Content = new StringContent(JsonConvert.SerializeObject(new DatiParcheggio
                     {
-                        if (AreeParcheggio.Name == $"Button{v.Key}")
-                        {
-                            AreeParcheggio.Background = new SolidColorBrush(Colors.Red);
-                            AreeParcheggio.FontSize = 14;
-                            AreeParcheggio.FontFamily = new FontFamily("Verdana");
-                            AreeParcheggio.Content = v.Value;
-                        }
-                    }
-                    Grid.SetRow(AreeParcheggio, k);
-                    Grid.SetColumn(AreeParcheggio, j);
-                    grid.Children.Add(AreeParcheggio);
+                        NomeParcheggio = NomeParcheggio,
+                        Status = status,
+                        rigaeliminata = rigaeliminata,
+                        colonnaeliminata = colonnaeliminata,
+                        ParcheggioEsistenteMenu = this.ParcheggioEsistenteMenu,
+                        ParcheggioNuovoMenu = this.ParcheggioNuovoMenu,
+                        CambioParcheggio = cambioparcheggio
+                    }), Encoding.UTF8, "application/json")
+                };
+                var response = await client.SendAsync(request);
+                var data = JsonConvert.DeserializeObject<ValoreRitornoParcheggioView>(await response.Content.ReadAsStringAsync());
+                // Imposto dei parametri per la griglia che visualizzara' il parcheggio.
+                grid.Background = new SolidColorBrush(Colors.Gray);
+                for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
+                {
+                    grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
                 }
+                for (int k = 0; k < Convert.ToInt32(data.Colonne); k++)
+                {
+                    grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(120) });
+                }
+                // Per ogni riga e colonna vado a inserirci un bottone.
+                for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
+                {
+                    for (int j = 0; j < Convert.ToInt32(data.Colonne); j++)
+                    {
+                        Button AreeParcheggio = new Button();
+                        AreeParcheggio.Name = "Button" + data.rigacompleta[k * Convert.ToInt32(data.Colonne)] + data.colonnacompleta[j];
+                        AreeParcheggio.Margin = new Thickness(2, 2, 0, 0);
+                        AreeParcheggio.Background = new SolidColorBrush(Colors.LimeGreen);
+                        AreeParcheggio.Click += new RoutedEventHandler(AllButtonClick);
+                        // Controllo per verificare se in quel determinato parcheggio e' presente un veicolo usando questo dizionario passatomi dall'API.
+                        foreach (var v in data.keyValues)
+                        {
+                            if (AreeParcheggio.Name == $"Button{v.Key}")
+                            {
+                                AreeParcheggio.Background = new SolidColorBrush(Colors.Red);
+                                AreeParcheggio.FontSize = 14;
+                                AreeParcheggio.FontFamily = new FontFamily("Verdana");
+                                AreeParcheggio.Content = v.Value;
+                            }
+                        }
+                        Grid.SetRow(AreeParcheggio, k);
+                        Grid.SetColumn(AreeParcheggio, j);
+                        grid.Children.Add(AreeParcheggio);
+                    }
+                }
+                // Per finire importo questa griglia in quella presente nel file XAML.
+                    ParcheggioView.Children.Add(grid);
             }
-            // Per finire importo questa griglia in quella presente nel file XAML.
-            ParcheggioView.Children.Add(grid);
+            else
+            {
+                for (int i = 0; i < 5; i++)
+                {
+                    grid1.RowDefinitions.Add(new RowDefinition());
+                    if(i == 2)
+                        grid1.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(100)});
+                    else
+                        grid1.ColumnDefinitions.Add(new ColumnDefinition());
+                }
+                for (int i = 0; i < 2; i++)
+                {
+                    if(i == 1)
+                    {
+                        Button button = new Button();
+                        button.Content = "Nuovo Parcheggio";
+                        button.Height = 100;
+                        button.FontSize = 40;
+                        button.Click += new RoutedEventHandler(NuovoParcheggioClick);
+                        Grid.SetRow(button, 2);
+                        Grid.SetColumn(button, 1);
+                        grid1.Children.Add(button);
+                    }
+                    else
+                    {
+                        Button button = new Button();
+                        button.Content = "Parcheggio Esistente";
+                        button.Height = 100;
+                        button.FontSize = 40;
+                        button.Click += new RoutedEventHandler(ParcheggioEsistenteClick);
+                        Grid.SetRow(button, 2);
+                        Grid.SetColumn(button, 3);
+                        grid1.Children.Add(button);
+                    }
 
+                }
+                ParcheggioView.Children.Add(grid1);
+            }
         }
 
-            #endregion
+        #endregion
 
         #region Menù
 
@@ -315,7 +327,7 @@ namespace Parcheggio.Views
         {
             this.Hide();
             PrimoAvvio = true;
-            await SupportSecondaParte();
+            //await SupportSecondaParte();
             await SupportTerzaParte();
             Aggiorna(new { }, new RoutedEventArgs());
             this.Show();
@@ -362,7 +374,7 @@ namespace Parcheggio.Views
         /// </summary>
         private async void Aggiorna(object sender, RoutedEventArgs e)
         {
-            GenerazioneParcheggio(4,false);
+            GenerazioneParcheggio(4,false, LoginCompletato);
         }
 
         /// <summary>

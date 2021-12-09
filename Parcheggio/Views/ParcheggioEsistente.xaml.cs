@@ -46,12 +46,12 @@ namespace Parcheggio.Views
         #endregion
 
         #region Constructor
-        public ParcheggioEsistente(string admin)
+        public ParcheggioEsistente(bool admin)
         {
             GetObtainParkingList();
             InitializeComponent();
             this.DataContext = this;
-            if (admin == "false") btElimina.Visibility = System.Windows.Visibility.Collapsed;
+            if (!admin) btElimina.Visibility = System.Windows.Visibility.Collapsed;
             else btElimina.Visibility = System.Windows.Visibility.Visible;
         }
 

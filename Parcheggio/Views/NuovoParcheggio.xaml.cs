@@ -48,13 +48,14 @@ namespace Parcheggio.Views
 
         #region Events
 
-        private void ConfermaCreaParcheggioClick(object sender, RoutedEventArgs e)
+        private async void ConfermaCreaParcheggioClick(object sender, RoutedEventArgs e)
         {
 
             ParcheggioCreato = true;
             if (Righe != null && Colonne != null && NomeParcheggio != null)
             {
-                PostInsertNewParking();
+                await PostInsertNewParking();
+                this.Close();
             }
             else
             {
