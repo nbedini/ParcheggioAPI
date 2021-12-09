@@ -218,6 +218,13 @@ namespace Parcheggio.Views
             Grid grid1 = new Grid();
             if (!logineffettuato)
             {
+                itProprietari.Visibility = Visibility.Visible;
+                Menu.Visibility = Visibility.Visible;
+                IncassoStorico.Visibility = Visibility.Visible;
+                IncassoGiornaliero.Visibility = Visibility.Visible;
+                VeicoliAttuali.Visibility = Visibility.Visible;
+                aggiorna.Visibility = Visibility.Visible;
+                storico.Visibility = Visibility.Visible;
                 // Creo una richiesta di tipo POST e come body gli spedisco un oggetto di tipo DatiParcheggio.
                 // Dopo aver mandato la richiesta converto nel tipo di dato che mi interessa la stringa di risposta.
                 HttpRequestMessage request = new HttpRequestMessage
@@ -278,6 +285,13 @@ namespace Parcheggio.Views
             }
             else
             {
+                itProprietari.Visibility = Visibility.Collapsed;
+                Menu.Visibility = Visibility.Collapsed;
+                IncassoStorico.Visibility = Visibility.Collapsed;
+                IncassoGiornaliero.Visibility = Visibility.Collapsed;
+                VeicoliAttuali.Visibility = Visibility.Collapsed;
+                aggiorna.Visibility = Visibility.Collapsed;
+                storico.Visibility = Visibility.Collapsed;
                 for (int i = 0; i < 5; i++)
                 {
                     grid1.RowDefinitions.Add(new RowDefinition());

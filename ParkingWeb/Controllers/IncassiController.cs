@@ -23,7 +23,7 @@ namespace ParkingWeb.Controllers
 
                 if (Name != "")
                 {
-                    listaIncassi.Incassi = listaIncassi.Incassi.Where(w => w.NomeParcheggio == Name).ToList();
+                    listaIncassi.Incassi = listaIncassi.Incassi.Where(w => w.NomeParcheggio == Name).OrderBy(ob => ob.Giorno).ToList();
                     return View(listaIncassi);
                 }
                 if (!String.IsNullOrEmpty(searchName))

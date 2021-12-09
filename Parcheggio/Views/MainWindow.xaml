@@ -18,13 +18,13 @@
                         <DockPanel HorizontalAlignment="Stretch"/>
                     </ItemsPanelTemplate>
                 </Menu.ItemsPanel>
-                <MenuItem Header="_Menù" Height="30" Click="Ritorna_Menu"/>
-                <MenuItem Height="30" Header="Veicoli Attuali" Click="Stato_Completo"/>
-                <MenuItem Height="30" Header="_Storico" Click="Storico"/>
-                <MenuItem Header="_Incasso Attuale" Height="30" Click="Incasso_Giornaliero"/>
-                <MenuItem Header="_Incasso Storico" Height="30" Click="Incasso_Storico"/>
+                <MenuItem x:Name="Menu" Header="_Menù" Height="30" Click="Ritorna_Menu"/>
+                <MenuItem x:Name="VeicoliAttuali" Height="30" Header="Veicoli Attuali" Click="Stato_Completo"/>
+                <MenuItem x:Name="storico" Height="30" Header="_Storico" Click="Storico"/>
+                <MenuItem x:Name="IncassoGiornaliero" Header="_Incasso Attuale" Height="30" Click="Incasso_Giornaliero"/>
+                <MenuItem x:Name="IncassoStorico" Header="_Incasso Storico" Height="30" Click="Incasso_Storico"/>
                 <MenuItem x:Name="itProprietari" Header="Proprietari" Height="30" Click="MenuItem_Click"/>
-                <MenuItem Header="Aggiorna" Click="Aggiorna" Height="30"/>
+                <MenuItem x:Name="aggiorna" Header="Aggiorna" Click="Aggiorna" Height="30"/>
                 <MenuItem Header="{Binding UserLoggato}" Height="30" HorizontalAlignment="Right">
                     <MenuItem Header="Logout" Height="30" Click="Logout_Click"/>
                 </MenuItem>
