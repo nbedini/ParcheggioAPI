@@ -12,12 +12,19 @@ namespace ParkingWeb.Controllers
     {
         [HttpGet]
         [Route("/Incassi")]
-        public IActionResult Index()
+        public IActionResult Index(string searchName)
         {
-            using(ParkingSystemContext model = new ParkingSystemContext())
+            ViewData["NomeParcheggioDetails"] = searchName;
+
+            using (ParkingSystemContext model = new ParkingSystemContext())
             {
                 IncassiGornalieri listaIncassi = new IncassiGornalieri();
                 listaIncassi.Incassi = model.ParkingAmounts.ToList();
+                if (!String.IsNullOrEmpty(searchName))
+                {
+                    listaIncassi.Incassi = listaIncassi.Incassi.Where(w => w.NomeParcheggio.Contains(searchName)).ToList();
+                }
+            
                 return View(listaIncassi);
             }
         }

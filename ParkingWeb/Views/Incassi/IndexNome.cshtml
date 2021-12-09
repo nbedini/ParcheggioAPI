@@ -1,0 +1,58 @@
+﻿@model ParkingWeb.Models.IncassiGornalieri
+@{
+    ViewData["Title"] = "Index";
+}
+
+@{/*
+      <h1>Proprietario</h1>
+
+          <div>
+              <hr />
+              <dl class="row">
+                  <dt class="col-sm-2">
+                      @Html.DisplayNameFor(model => model.Incassi.Giorno)
+                  </dt>
+                  <dd class="col-sm-10">
+                      @Html.DisplayFor(model => model.IGiorno)
+                  </dd>
+                  <dt class="col-sm-2">
+                      @Html.DisplayNameFor(model => model.Incassi.NomeParcheggio)
+                  </dt>
+                  <dd class="col-sm-10">
+                      @Html.DisplayFor(model => model.NomeParcheggio)
+                  </dd>
+                  <dt class="col-sm-2">
+                      @Html.DisplayNameFor(model => model.IncassoTotale)
+                  </dt>
+                  <dd class="col-sm-10">
+                      @Html.DisplayFor(model => model.Person)
+                  </dd>
+              </dl>
+          </div>
+            */
+}
+
+<div>
+    <h4>INCASSI</h4>
+    <hr />
+    <table class="table table-bordered table-hover">
+        <tr>
+            <th>Targa</th>
+            <th>Nome del Parcheggio</th>
+            <th>Incasso</th>
+
+        </tr>
+        @foreach (var d in Model.Incassi)
+        {
+            <tr>
+                <td>@d.Giorno</td>
+                <td>@d.NomeParcheggio</td>
+                <td>@d.IncassoTotale</td>
+            </tr>
+        }
+    </table>
+</div>
+
+
+<div>
+</div>
