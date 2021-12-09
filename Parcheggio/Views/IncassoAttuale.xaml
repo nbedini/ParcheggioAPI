@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Parcheggio.Views"
         mc:Ignorable="d"
-        Title="Incasso Attuale" Height="300" Width="335">
+        Title="Incasso Attuale" Height="150" Width="335">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Parcheggio.Models;
 using ParcheggioAPI.Controllers;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,7 @@ namespace Parcheggio.Views
         private async void SubmitClick(object sender, RoutedEventArgs e)
         {
             string password = tbPassword.Password;
-            object candidato = new { username = UsernameForm, password = password };
+            object candidato = new User { Username = UsernameForm, Password = password};
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,

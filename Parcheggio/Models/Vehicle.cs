@@ -26,8 +26,8 @@ namespace Parcheggio.Models
         public string Propietario { get; set; }
         public string TipoVeicolo { get; set; }
     
-        public virtual Person Person { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<ParkingHistory> ParkingHistorys { get; set; }
+        public virtual Person Person { get; set; }
     }
 }

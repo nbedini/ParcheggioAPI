@@ -70,7 +70,7 @@ namespace Parcheggio.Views
             this.DataContext = this;
         }
 
-        public async Task GetStorico()
+        public async void GetStorico()
         {
             HttpRequestMessage request = new HttpRequestMessage
             {

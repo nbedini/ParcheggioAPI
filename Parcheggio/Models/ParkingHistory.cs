@@ -26,8 +26,8 @@ namespace Parcheggio.Models
         public string Propietario { get; set; }
     
         public virtual ParkingCost ParkingCost { get; set; }
-        public virtual Person Person { get; set; }
         public virtual Parking Parking { get; set; }
+        public virtual Person Person { get; set; }
         public virtual Vehicle Vehicle { get; set; }
     }
 }

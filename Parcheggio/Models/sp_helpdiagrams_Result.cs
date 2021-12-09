@@ -10,13 +10,13 @@
 namespace Parcheggio.Models
 {
     using System;
-    using System.Collections.Generic;
     
-    public partial class User
+    public partial class sp_helpdiagrams_Result
     {
-        public long Id { get; set; }
-        public string Username { get; set; }
-        public string Password { get; set; }
-        public bool IsAdmin { get; set; }
+        public string Database { get; set; }
+        public string Name { get; set; }
+        public int ID { get; set; }
+        public string Owner { get; set; }
+        public int OwnerID { get; set; }
     }
 }
