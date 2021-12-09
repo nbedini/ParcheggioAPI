@@ -27,7 +27,7 @@ namespace ParcheggioAPI.Controllers
                     string targa = model.Vehicles.FirstOrDefault(f => f.Targa == targaVeicolo).Targa;
                     if (targa == null)
                     {
-                        logger.Log(NLog.LogLevel.Fatal, "Veicolo non trovato.");
+                        logger.Log(NLog.LogLevel.Error, "Veicolo non trovato");
                         return NotFound("Veicolo non trovato");
                     }
 
@@ -43,12 +43,14 @@ namespace ParcheggioAPI.Controllers
                     }
                     else
                     {
+                        logger.Log(NLog.LogLevel.Error, "Veicolo non trovato.");
                         return Content("La targa riportata non corrisponde al pattern Europeo, probabilmente è una targa personalizzata");
                     }
                 }
             }
             else
             {
+                logger.Log(NLog.LogLevel.Error, "Veicolo non trovato.");
                 return Problem("La targa del veicolo non contiene il numero corretto di caratteri, controllare ");
             }
 

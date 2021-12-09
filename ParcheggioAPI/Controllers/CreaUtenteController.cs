@@ -24,12 +24,11 @@ namespace ParcheggioAPI
                 if (model.Users.Select(s => new { s.Id, s.Username }).FirstOrDefault(i => i.Username == utente.Username) == null)
                 {
                     logger.Log(LogLevel.Info, "Creazione utente con username {User}.",utente.Username);
-                    string a = logger.Name;
                     model.Users.Add(utente);
                     model.SaveChanges();
-                    return Ok(a);
+                    return Ok();
                 }
-                logger.Log(LogLevel.Fatal, "Tentata creazione utente con username {User} già utilizzato.", utente.Username);
+                logger.Log(LogLevel.Error, "Tentata creazione utente con username {User} già utilizzato.", utente.Username);
                 return Problem();
             }
         }

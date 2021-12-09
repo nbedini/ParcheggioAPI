@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NLog;
 using ParcheggioAPI.Models;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,12 @@ using System.Threading.Tasks;
 
 namespace ParcheggioAPI.Controllers
 {
+    
     [Route("api/[controller]")]
     [ApiController]
     public class ExistingParkingController : ControllerBase
     {
+        public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         [HttpGet("/api/existing")]
         public ActionResult ExistingParking()
         {
@@ -35,7 +38,11 @@ namespace ParcheggioAPI.Controllers
 
             //if() { return Unauthorized("Accesso negato"); }
 
-            if (parking == null) { return Problem("Fornire un parcheggio corretto"); }
+            if (parking == null) 
+            {
+                logger.Log(LogLevel.Error, "Tentata eliminazione di un parcheggio non esistente");
+                return Problem("Fornire un parcheggio corretto"); 
+            }
 
             using (ParkingSystemContext model = new ParkingSystemContext())
             {
@@ -47,6 +54,7 @@ namespace ParcheggioAPI.Controllers
 
                 model.Parkings.Remove(removeParking);
                 model.SaveChanges();
+                logger.Log(LogLevel.Info, "Eliminazione del parcheggio {parcheggio}",removeParking.NomeParcheggio);
                 return Ok("Parcheggio rimosso con successo");
             }
         }

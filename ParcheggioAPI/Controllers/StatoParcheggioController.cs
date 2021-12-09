@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using NLog;
 using ParcheggioAPI.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,7 @@ namespace ParcheggioAPI.Controllers
     [ApiController]
     public class StatoParcheggioController : ControllerBase
     {
+        public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         [HttpPost("/api/statocompletogrid")]
         public ActionResult StatoCompletoGrid([FromBody]string NomeParcheggio)
         {
