@@ -11,8 +11,8 @@ namespace ParkingWeb.Controllers
     public class IncassiController : Controller
     {
         [HttpGet]
-        [Route("/Incassi")]
-        public IActionResult Index(string searchName)
+        [Route("/Incassi/{Name}")]
+        public IActionResult Index(string Name, string searchName)
         {
             ViewData["NomeParcheggioDetails"] = searchName;
 
@@ -20,11 +20,17 @@ namespace ParkingWeb.Controllers
             {
                 IncassiGornalieri listaIncassi = new IncassiGornalieri();
                 listaIncassi.Incassi = model.ParkingAmounts.ToList();
+
+                if (Name != "")
+                {
+                    listaIncassi.Incassi = listaIncassi.Incassi.Where(w => w.NomeParcheggio == Name).ToList();
+                    return View(listaIncassi);
+                }
                 if (!String.IsNullOrEmpty(searchName))
                 {
                     listaIncassi.Incassi = listaIncassi.Incassi.Where(w => w.NomeParcheggio.ToLower().Contains(searchName.ToLower())).ToList();
                 }
-            
+
                 return View(listaIncassi);
             }
         }
