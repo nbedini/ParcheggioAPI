@@ -17,52 +17,40 @@ namespace ParcheggioAPI.Controllers
     public class TempoTariffaController : ControllerBase
     {
         public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
-        [HttpGet("/api/IncassoAttuale")]
-        public ActionResult GetIncassoGiornaliero()
+
+        [HttpGet("/api/IncassiStorico/{Name}")]
+        public ActionResult Index(string Name)
         {
             using (ParkingSystemContext model = new ParkingSystemContext())
             {
-                if (model.ParkingAmounts.Any())
-                    return Ok(model.ParkingAmounts.ToList());
+                if (Name != "")
+                {
+                    var listaincassi = model.ParkingAmounts.Where(w => w.NomeParcheggio == Name).OrderBy(ob => ob.Giorno).ToList();
+                    return Ok(listaincassi);
+                }
                 else
-                    return NotFound("Nessun Incasso Trovato");
-            }
-        }
-        [HttpGet("/api/IncassoAttuale/{NomeParcheggio}")]
-        public ActionResult GetOneIncassoGiornaliero_Nome(string NomeParcheggio)
-        {
-            using (ParkingSystemContext model = new ParkingSystemContext())
-            {
-                if (model.ParkingAmounts.Any(q => q.NomeParcheggio == NomeParcheggio))
-                    return Ok(model.ParkingAmounts.Where(q => q.NomeParcheggio == NomeParcheggio).ToList());
-                else
-                    return NotFound("Nessun Incasso trovato per questo parcheggio");
-            }
-        }
-        [HttpGet("/api/IncassoAttuale/{Giorno}")]
-        public ActionResult GetOneIncassoGiornaliero_Giorno(DateTime Giorno)
-        {
-            using (ParkingSystemContext model = new ParkingSystemContext())
-            {
-                if (model.ParkingAmounts.Any(q => q.Giorno.Day == Giorno.Day))
-                    return Ok(model.ParkingAmounts.Where(q => q.Giorno.Day == Giorno.Day).ToList());
-                else
-                    return NotFound("Nessun Incasso trovato per questo Giorno");
-            }
-        }
-        [HttpGet("/api/IncassoAttuale/{NomeParcheggio}/{Giorno}")]
-        public ActionResult GetOneIncassoGiornaliero(string NomeParcheggio, DateTime Giorno)
-        {
-            using (ParkingSystemContext model = new ParkingSystemContext())
-            {
-                if (model.ParkingAmounts.Any(q => q.Giorno == Giorno && q.NomeParcheggio == NomeParcheggio))
-                    return Ok(model.ParkingAmounts.Where(q => q.Giorno == Giorno && q.NomeParcheggio == NomeParcheggio).ToList());
-                else
-                    return NotFound("Nessun Incasso trovato per questo Parcheggio");
+                    return BadRequest();
             }
         }
 
-
+        [HttpGet("/api/IncassiAttuali/{nomeparcheggio}")]
+        public ActionResult IncassiAttuali(string nomeparcheggio)
+        {
+            using (ParkingSystemContext model = new ParkingSystemContext())
+            {
+                var incassoodierno = model.ParkingAmounts.FirstOrDefault(fod => fod.Giorno == DateTime.Today && fod.NomeParcheggio == nomeparcheggio);
+                var autousciteoggi = model.ParkingHistorys.Where(w => w.DataOrarioUscita.Date == DateTime.Today && w.NomeParcheggio == nomeparcheggio).ToList();
+                IncassiAttualiViewModel incassiAttuali = new IncassiAttualiViewModel
+                {
+                    VeicoliUscitiOggi = autousciteoggi,
+                    IncassoAttuale = incassoodierno
+                };
+                if (incassiAttuali.VeicoliUscitiOggi != null && incassiAttuali.IncassoAttuale != null)
+                    return Ok(incassiAttuali);
+                else
+                    return NotFound();
+            }
+        }
     }
 }
 

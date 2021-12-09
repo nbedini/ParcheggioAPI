@@ -17,4 +17,8 @@
     <PackageReference Include="NLog.Schema" Version="4.7.13" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ParkingWeb\ParkingWeb.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -5,34 +5,54 @@ using System.Linq;
 using System.Threading.Tasks;
 using ParkingWeb.Model;
 using ParkingWeb.Models;
+using System.Net.Http;
+using Newtonsoft.Json;
+using System.Threading;
+using ParkingWeb.ViewModels;
 
 namespace ParkingWeb.Controllers
 {
     public class IncassiController : Controller
     {
-        [HttpGet]
-        [Route("/Incassi/{Name}")]
-        public IActionResult Index(string Name, string searchName)
+        [HttpGet("/IncassiStorico/{Name}")]
+        public async Task<ActionResult> Index(string Name)
         {
-            ViewData["NomeParcheggioDetails"] = searchName;
+            HttpClient client = new HttpClient();
 
-            using (ParkingSystemContext model = new ParkingSystemContext())
+            HttpRequestMessage request = new HttpRequestMessage
             {
-                IncassiGornalieri listaIncassi = new IncassiGornalieri();
-                listaIncassi.Incassi = model.ParkingAmounts.ToList();
-
-                if (Name != "")
-                {
-                    listaIncassi.Incassi = listaIncassi.Incassi.Where(w => w.NomeParcheggio == Name).OrderBy(ob => ob.Giorno).ToList();
-                    return View(listaIncassi);
-                }
-                if (!String.IsNullOrEmpty(searchName))
-                {
-                    listaIncassi.Incassi = listaIncassi.Incassi.Where(w => w.NomeParcheggio.ToLower().Contains(searchName.ToLower())).ToList();
-                }
-
-                return View(listaIncassi);
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://localhost:31329/api/IncassiStorico/{Name}")
+            };
+            var response = await client.SendAsync(request);
+            if (response.StatusCode == System.Net.HttpStatusCode.OK)
+            {
+                IncassiGornalieri incassiGornalieri = new IncassiGornalieri 
+                { 
+                    Incassi = JsonConvert.DeserializeObject<List<ParkingAmount>>(await response.Content.ReadAsStringAsync()) 
+                };
+                return View(incassiGornalieri);
             }
+            else
+                return BadRequest();
+        }
+
+        [HttpGet("/IncassiAttuali/{nomeparcheggio}")]
+        public async Task<ActionResult> IncassiAttuali(string nomeparcheggio)
+        {
+            HttpClient client = new HttpClient();
+
+            HttpRequestMessage request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://localhost:31329/api/IncassiAttuali/{nomeparcheggio}")
+            };
+            var response = await client.SendAsync(request);
+            var data = JsonConvert.DeserializeObject<IncassiAttualiViewModel>(await response.Content.ReadAsStringAsync());
+            if (data != null)
+                return View(data);
+            else
+                return BadRequest();
         }
     }
 }

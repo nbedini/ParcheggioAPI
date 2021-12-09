@@ -5,14 +5,11 @@
 }
 
 <form method="get" asp-action="Index">
-    <p style="position:relative; left:635px">
-        <input type="search" placeholder="Cerca per Nome Parcheggio" value="@ViewData["NomeParcheggioDetails"]" name="searchName" style="width:225px" />
-        <input type="submit" value="Search" class="btn btn-light" />
-    </p>
+    <p style="position:relative; left:635px"/>
 </form>
 
 <div>
-    <h4>INCASSI</h4>
+    <h4>Storico Incassi</h4>
     <hr />
     <table class="table table-light table-bordered" style="width:100%">
         <tr>
@@ -24,7 +21,7 @@
         @foreach (var d in Model.Incassi)
         {
             <tr>
-                <td>@d.Giorno</td>
+                <td>@d.Giorno.ToShortDateString()</td>
                 <td>@d.NomeParcheggio</td>
                 <td>@d.IncassoTotale €</td>
             </tr>

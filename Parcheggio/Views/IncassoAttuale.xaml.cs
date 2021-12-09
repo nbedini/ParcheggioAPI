@@ -30,22 +30,10 @@ namespace Parcheggio.Views
         {
             InitializeComponent();
             Parcheggio = nomeParcheggio;
-            CompilazioneForm();
+            WebBrowser webBrowser = new WebBrowser();
+            webBrowser.Source = new Uri($"http://localhost:34483/IncassiAttuali/{Parcheggio}");
+            DefaultGrid.Children.Add(webBrowser);
             this.DataContext = this;
-        }
-
-        public async void CompilazioneForm()
-        {
-            Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT");
-            HttpRequestMessage request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri($"http://localhost:31329/api/IncassoAttuale/{Parcheggio}/{DateTime.Today}")
-            };
-            var response = await client.SendAsync(request);
-            var data = JsonConvert.DeserializeObject<List<ParkingAmount>>(await response.Content.ReadAsStringAsync());
-            if(data != null)
-                Incasso_Giornaliero.ItemsSource = data;
         }
     }
 }

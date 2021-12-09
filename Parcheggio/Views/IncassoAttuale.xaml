@@ -5,23 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Parcheggio.Views"
         mc:Ignorable="d"
-        Title="Incasso Attuale" Height="150" Width="335">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="4.8"></RowDefinition>
-            <RowDefinition Height="182*"></RowDefinition>
-        </Grid.RowDefinitions>
-        <DockPanel Margin="35,2,35,3" Grid.Row="1">
-            <DataGrid x:Name="Incasso_Giornaliero" AutoGenerateColumns="False" CanUserDeleteRows="False" CanUserAddRows="False" IsReadOnly="True" DockPanel.Dock="top">
-                <DataGrid.Columns>
-                    <DataGridTextColumn Header="Incasso" Width="150" Binding="{Binding IncassoTotale}"/>
-                    <DataGridTextColumn Header="Parcheggio" Width="150" Binding="{Binding NomeParcheggio}"/>
-
-                </DataGrid.Columns>
-            </DataGrid>
-        </DockPanel>
-    </Grid>
+        Title="Incasso Attuale" MinHeight="533.175" MinWidth="827.725">
+    <Grid Name="DefaultGrid"/>
 </Window>

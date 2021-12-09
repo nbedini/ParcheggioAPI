@@ -26,7 +26,7 @@ namespace Parcheggio.Views
 
             Parcheggio = nomeParcheggio;
             WebBrowser webBrowser = new WebBrowser();
-            webBrowser.Source = new Uri($"http://localhost:34483/Incassi/{Parcheggio}");
+            webBrowser.Source = new Uri($"http://localhost:34483/IncassiStorico/{Parcheggio}");
             DefaultGrid.Children.Add(webBrowser);
             this.DataContext = this;
         }

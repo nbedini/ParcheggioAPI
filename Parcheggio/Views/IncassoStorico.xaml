@@ -5,6 +5,6 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Parcheggio.Views"
         mc:Ignorable="d"
-        Title="IncassoGiornaliero" MinHeight="533.175" MinWidth="827.725">
+        Title="Incasso Storico" MinHeight="533.175" MinWidth="827.725">
     <Grid Name="DefaultGrid"/>
 </Window>
