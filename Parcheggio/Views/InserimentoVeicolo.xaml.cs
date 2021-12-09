@@ -164,7 +164,7 @@ namespace Parcheggio.Views
 
                     if (ps.Targa == Targa)
                     {
-                        MessageBox.Show("Impossibile inserire due volte la stessa targa nel parcheggio", "Inserimento Impossibile", MessageBoxButton.OK, MessageBoxImage.Error);
+                        MessageBox.Show("Impossibile inserire piu' volte la stessa targa", "Inserimento Impossibile", MessageBoxButton.OK, MessageBoxImage.Error);
                         return;
                     }
                 }
