@@ -25,5 +25,6 @@ namespace Parcheggio.Properties {
         }
         public static string Token
         { get; set; }
+        public static string Username { get; set; }
     }
 }

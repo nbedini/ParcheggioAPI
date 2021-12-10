@@ -23,7 +23,7 @@ namespace ParcheggioAPI.Controllers
                 if(usercredentials.Password != null && usercredentials.Username != null)
                 {
                     var candidate = model.Users.FirstOrDefault(fod => fod.Username == usercredentials.Username && fod.Password == usercredentials.Password);
-                    if (candidate == null) return NotFound("Username o password errati");
+                    if (candidate == null) return NotFound();
 
                     var TokenHandler = new JwtSecurityTokenHandler();
                     var TokenDescriptor = new SecurityTokenDescriptor
@@ -40,6 +40,7 @@ namespace ParcheggioAPI.Controllers
                     };
 
                     SecurityToken token = TokenHandler.CreateToken(TokenDescriptor);
+                    
                     logger.Log(LogLevel.Info, "Login utente con username {User}.", usercredentials.Username);
                     LoginClass LC = new LoginClass
                     {

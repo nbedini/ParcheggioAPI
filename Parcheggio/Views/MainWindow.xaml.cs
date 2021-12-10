@@ -284,40 +284,62 @@ namespace Parcheggio.Views
                 VeicoliAttuali.Visibility = Visibility.Collapsed;
                 aggiorna.Visibility = Visibility.Collapsed;
                 storico.Visibility = Visibility.Collapsed;
-                for (int i = 0; i < 5; i++)
+                
+                if (AdminYesONo)
                 {
-                    grid1.RowDefinitions.Add(new RowDefinition());
-                    if(i == 2)
-                        grid1.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(100)});
-                    else
-                        grid1.ColumnDefinitions.Add(new ColumnDefinition());
-                }
-                for (int i = 0; i < 2; i++)
-                {
-                    if(i == 1)
+                    for (int i = 0; i < 5; i++)
                     {
-                        Button button = new Button();
-                        button.Content = "Nuovo Parcheggio";
-                        button.Height = 100;
-                        button.FontSize = 40;
-                        button.Click += new RoutedEventHandler(NuovoParcheggioClick);
-                        Grid.SetRow(button, 2);
-                        Grid.SetColumn(button, 1);
-                        grid1.Children.Add(button);
+                        grid1.RowDefinitions.Add(new RowDefinition());
+                        if (i == 2)
+                            grid1.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(100) });
+                        else
+                            grid1.ColumnDefinitions.Add(new ColumnDefinition());
                     }
-                    else
+                    for (int i = 0; i < 2; i++)
                     {
-                        Button button = new Button();
-                        button.Content = "Parcheggio Esistente";
-                        button.Height = 100;
-                        button.FontSize = 40;
-                        button.Click += new RoutedEventHandler(ParcheggioEsistenteClick);
-                        Grid.SetRow(button, 2);
-                        Grid.SetColumn(button, 3);
-                        grid1.Children.Add(button);
-                    }
+                        if (i == 1)
+                        {
+                            Button button = new Button();
+                            button.Content = "Nuovo Parcheggio";
+                            button.Height = 100;
+                            button.FontSize = 40;
+                            button.Click += new RoutedEventHandler(NuovoParcheggioClick);
+                            Grid.SetRow(button, 2);
+                            Grid.SetColumn(button, 1);
+                            grid1.Children.Add(button);
+                        }
+                        else
+                        {
+                            Button button = new Button();
+                            button.Content = "Parcheggio Esistente";
+                            button.Height = 100;
+                            button.FontSize = 40;
+                            button.Click += new RoutedEventHandler(ParcheggioEsistenteClick);
+                            Grid.SetRow(button, 2);
+                            Grid.SetColumn(button, 3);
+                            grid1.Children.Add(button);
+                        }
 
+                    }
                 }
+                else
+                {
+                    
+                    grid1.RowDefinitions.Add(new RowDefinition());
+                    grid1.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(100) });
+                    grid1.ColumnDefinitions.Add(new ColumnDefinition());
+                    
+                    Button button = new Button();
+                    button.Content = "Parcheggio Esistente";
+                    button.Height = 100;
+                    button.Width = 500;
+                    button.FontSize = 40;
+                    button.Click += new RoutedEventHandler(ParcheggioEsistenteClick);
+                    Grid.SetRow(button, 2);
+                    Grid.SetColumn(button, 2);
+                    grid1.Children.Add(button);
+                }
+                
                 ParcheggioView.Children.Add(grid1);
             }
         }

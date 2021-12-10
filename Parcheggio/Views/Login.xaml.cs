@@ -48,10 +48,13 @@ namespace Parcheggio.Views
                 Content = new StringContent(JsonConvert.SerializeObject(candidato), Encoding.UTF8, "application/json")
             };
             var response = await client.SendAsync(request);
-            var data = JsonConvert.DeserializeObject<LoginClass>(await response.Content.ReadAsStringAsync());
-            UsernameLogin = data.Username;
+            
+            
             if (response.IsSuccessStatusCode)
             {
+
+                var data = JsonConvert.DeserializeObject<LoginClass>(await response.Content.ReadAsStringAsync());
+                Properties.Settings.Username = data.Username;
                 Properties.Settings.Token = data.Token;
                 client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", data.Token);
                 var request2 = new HttpRequestMessage
@@ -65,11 +68,14 @@ namespace Parcheggio.Views
                 Risposta = Boolean.Parse(risposta);
                 LoginEffettuatoChiusuraForm = true;
                 LoginCompletato = true;
+                UsernameLogin = Properties.Settings.Username;
                 this.Close();
             }
             else
             {
-                MessageBox.Show("Password sbagliata");
+                Properties.Settings.Username = "";
+                Properties.Settings.Token = "";
+                MessageBox.Show("Username o password sbagliata");
             }
 
         }
