@@ -27,6 +27,8 @@ namespace ParcheggioAPI
             string riga = "", colonna = "";
             if (datiParcheggio != null)
             {
+                #region Ottenimento auto parcheggiate con causale per il cambio parcheggio.
+
                 if (datiParcheggio.Status == 1)
                 {
                     #region Controllo Righe e Colonne
@@ -53,19 +55,24 @@ namespace ParcheggioAPI
                             riga = v.Riga;
                             colonna = v.Colonna;
                         }
-                        if (datiParcheggio.CambioParcheggio)
-                        {
-                            foreach(var delete in keyValues)
-                            {
-                                keyValues.Remove(delete.Key);
-                            }
-                        }
                         keyValues.Add(riga + colonna, v.Targa);
+                    }
+                    if (datiParcheggio.CambioParcheggio)
+                    {
+                        foreach (var delete in keyValues)
+                        {
+                            keyValues.Remove(delete.Key);
+                        }
                     }
 
                     #endregion
 
                 }
+
+                #endregion
+
+                #region Eliminazione visiva del veicolo dalla vista.
+
                 else if (datiParcheggio.Status == 2)
                 {
                     #region Controllo Righe e Colonne
@@ -96,6 +103,11 @@ namespace ParcheggioAPI
                     keyValues.Remove(riga + colonna);
 
                 }
+
+                #endregion
+
+                #region Inserimento veicolo con ricerca della targa tramite coordinate.
+
                 else if (datiParcheggio.Status == 3)
                 {
                     #region Controllo Righe e Colonne
@@ -133,6 +145,11 @@ namespace ParcheggioAPI
                     }
 
                 }
+
+                #endregion
+
+                #region Aggiornamento della vista nella pagina WPF.
+
                 else if (datiParcheggio.Status == 4)
                 {
                     keyValues = new Dictionary<string, string>();
@@ -167,6 +184,8 @@ namespace ParcheggioAPI
                     #endregion
 
                 }
+
+                #endregion
             }
         }
 
@@ -200,7 +219,6 @@ namespace ParcheggioAPI
             }
         }
 
-        //Creiamo il metodo per il recupero dati dal DB
         public static List<ParkingStatuss> RecuperoDatiDB(out List<Person> people)
         {
             using (ParkingSystemContext model = new ParkingSystemContext())

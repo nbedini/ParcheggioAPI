@@ -13,16 +13,24 @@
     <h4>Incassi Attuali</h4>
     <hr />
     <table class="table table-light table-bordered" style="width:100%">
-        <tr>
-            <th>Giorno</th>
-            <th>Nome del Parcheggio</th>
-            <th>Incasso</th>
-        </tr>
-        <tr>
-            <th>@Model.IncassoAttuale.Giorno.ToShortDateString()</th>
-            <th>@Model.IncassoAttuale.NomeParcheggio</th>
-            <th>@Model.IncassoAttuale.IncassoTotale €</th>
-        </tr>
+        
+            @if (Model.IncassoAttuale != null)
+            {
+                <tr>
+                    <th>Giorno</th>
+                    <th>Nome del Parcheggio</th>
+                    <th>Incasso</th>
+                </tr>
+                <tr>
+                    <th>@Model.IncassoAttuale.Giorno.ToShortDateString()</th>
+                    <th>@Model.IncassoAttuale.NomeParcheggio</th>
+                    <th>@Model.IncassoAttuale.IncassoTotale €</th>
+               </tr>
+            }
+            else
+            {
+                 <p style=" text-align: center; font-weight:700;">Per il momento non e' uscito nessun veicolo</p>
+            }
     </table>
 
 </div>
@@ -31,27 +39,36 @@
     <h4>Veicoli Usciti</h4>
     <hr />
     <table class="table table-light table-bordered" style="width:100%">
-        <tr>
-            <th>Targa</th>
-            <th>Data Entrata</th>
-            <th>Data Uscita</th>
-            <th>Tariffa</th>
-            <th>Tipo Veicolo</th>
-            <th>Nome Parcheggio</th>
-            <th>Proprietario</th>
-        </tr>
-        @foreach (var v in Model.VeicoliUscitiOggi)
+
+            @if (Model.VeicoliUscitiOggi != null)
             {
                 <tr>
-                    <th>@v.Targa</th>
-                    <th>@v.DataOrarioEntrata</th>
-                    <th>@v.DataOrarioUscita</th>
-                    <th>@v.Tariffa</th>
-                    <th>@v.TipoVeicolo</th>
-                    <th>@v.NomeParcheggio</th>
-                    <th>@v.Propietario</th>
+                    <th>Targa</th>
+                    <th>Data Entrata</th>
+                    <th>Data Uscita</th>
+                    <th>Tariffa</th>
+                    <th>Tipo Veicolo</th>
+                    <th>Nome Parcheggio</th>
+                    <th>Proprietario</th>
                 </tr>
+                @foreach (var v in Model.VeicoliUscitiOggi)
+                {
+                    <tr>
+                        <th>@v.Targa</th>
+                        <th>@v.DataOrarioEntrata</th>
+                        <th>@v.DataOrarioUscita</th>
+                        <th>@v.Tariffa</th>
+                        <th>@v.TipoVeicolo</th>
+                        <th>@v.NomeParcheggio</th>
+                        <th>@v.Propietario</th>
+                    </tr>
+                }
             }
+            else
+            {
+                 <p style=" text-align: center; font-weight:700;">Per il momento non e' uscito nessun veicolo</p>
+            }
+        
     </table>
 
 </div>

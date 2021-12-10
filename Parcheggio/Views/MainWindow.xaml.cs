@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region Namespace Esterni
+
+using System;
 using System.ComponentModel;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -11,6 +13,8 @@ using Newtonsoft.Json;
 using Parcheggio.Properties;
 using ParcheggioAPI.Models;
 
+#endregion
+
 namespace Parcheggio.Views
 {
     public partial class MainWindow : Window, INotifyPropertyChanged
@@ -19,10 +23,9 @@ namespace Parcheggio.Views
 
         // Dichiarazione delle proprieta' e interfacce.
 
+        public bool RitornoMenu { get; set; } = false;
         public bool LoginCompletato { get; set; } = true;
-        public bool CambioParcheggio { get; set; } = false;
         public bool PrimoAvvio { get; set; } = false;
-        public bool NienteRicarica { get; set; } = true;
         private string userloggato;
 
         public string UserLoggato
@@ -34,8 +37,6 @@ namespace Parcheggio.Views
                 if (PrimoAvvio) OnPropertyChanged("UserLoggato"); 
             }
         }
-
-        public bool Status { get; set; } = false;
         public bool AdminYesONo { get; set; } 
         public string TargaStatoParcheggio { get; set; }
         public bool ChiusuraStatoParcheggioEsci { get; set; } = false;
@@ -63,7 +64,6 @@ namespace Parcheggio.Views
         public bool LogoutEffettuato { get; set; } = true;
         public bool SwitchLoginRegistrazione { get; set; } = false;
         public bool SwitchRegistrazioneLogin { get; set; } = false;
-        public bool RegistrazioneEffettuata { get; set; } = false;
         public bool LoginChiusuraSenzaCompletamento { get; set; } = false;
         public HttpClient client { get; set; } = new HttpClient();
 
@@ -73,17 +73,32 @@ namespace Parcheggio.Views
 
         #region Costructor
 
-        #region Diverse Fasi
+        #region Support
 
-        public void SupportPrimaParte()
+        public async Task Support()
+        {
+            InitializeComponent();
+            if (!AdminYesONo) 
+                itProprietari.Visibility = Visibility.Collapsed;
+            else 
+                itProprietari.Visibility = Visibility.Visible;
+            if (PrimoAvvio) 
+                await GenerazioneParcheggio(4, true, LoginCompletato);
+            else 
+                await GenerazioneParcheggio(1, false, LoginCompletato);
+            LoginCompletato = false;
+            this.DataContext = this;
+        }
+
+        #endregion
+
+        public MainWindow()
         {
             while (LogoutEffettuato)
             {
-                // Chiamo il metodo della fase zero per far comparire come prima pagina quella di login.
                 Login LoginView = new Login();
                 LoginView.ShowDialog();
                 LoginCompletato = LoginView.LoginCompletato;
-                NienteRicarica = false;
                 UserLoggato = LoginView.UsernameLogin;
                 AdminYesONo = LoginView.Risposta;
                 LoginChiusuraSenzaCompletamento = LoginView.LoginEffettuatoChiusuraForm;
@@ -91,7 +106,6 @@ namespace Parcheggio.Views
                 LogoutEffettuato = false;
                 if (SwitchLoginRegistrazione)
                 {
-                    // Se l'utente invece di fare il login si deve registrare gli viene cambiata la pagina visualizzata in quella da registrazione.
                     Registrazione RegistrazioneView = new Registrazione();
                     RegistrazioneView.ShowDialog();
                     UserLoggato = RegistrazioneView.UsernameRegistrato;
@@ -111,37 +125,10 @@ namespace Parcheggio.Views
                     break;
                 }
             }
-            SupportTerzaParte();
+            Support();
         }
 
         #endregion
-
-        #region Fase Tre
-
-        /// <summary>
-        /// Metodo dell'ultima fase, quest'ultima controlla le variabili che sono state inserite in precedenza per effettuare determinate operazioni.
-        /// </summary
-        public async Task SupportTerzaParte()
-        {
-            InitializeComponent();
-            if (!AdminYesONo) itProprietari.Visibility = Visibility.Collapsed;
-            else itProprietari.Visibility = Visibility.Visible;
-            // Chiamate a un metodo asincrono che ottiene dall'API i dati e genera la visualizzazione del parcheggio.
-            if (PrimoAvvio) await GenerazioneParcheggio(4, true, LoginCompletato);
-            else await GenerazioneParcheggio(1, false, LoginCompletato);
-            LoginCompletato = false;
-            this.DataContext = this;
-        }
-
-        #endregion
-
-        #endregion
-
-        // Costruttore che chiama il metodo della fase uno.
-        public MainWindow()
-        {
-            SupportPrimaParte();
-        }
 
         #region Public Methods
 
@@ -206,13 +193,9 @@ namespace Parcheggio.Views
 
         #endregion
 
-        #region GenerazioneParcheggio usando API(int status, string rigaeliminata, string colonnaeliminata)
+        #region GenerazioneParcheggio usando API(int status, bool cambioparcheggio,bool logineffettuato, string rigaeliminata = "", string colonnaeliminata = "")
 
-        /// <summary>
-        /// Metodo che si occupa di contattare l'API e di generare il parcheggio dal lato grafico.
-        /// </summary>
-        /// Tutti i parametri in ingresso vengono mandati tramite chiamata http all'API.
-        public async Task GenerazioneParcheggio(int status, bool cambioparcheggio,bool logineffettuato, string rigaeliminata = "", string colonnaeliminata = "")
+        public async Task GenerazioneParcheggio(int status = 4, bool cambioparcheggio = false,bool logineffettuato = true, string rigaeliminata = "", string colonnaeliminata = "")
         {
             Grid grid = new Grid();
             Grid grid1 = new Grid();
@@ -340,10 +323,10 @@ namespace Parcheggio.Views
         private async void Ritorna_Menu(object sender, RoutedEventArgs e)
         {
             this.Hide();
-            PrimoAvvio = true;
-            //await SupportSecondaParte();
-            await SupportTerzaParte();
-            Aggiorna(new { }, new RoutedEventArgs());
+            LoginCompletato = true;
+            ParcheggioView.Children.Clear();
+            RitornoMenu = true;
+            await Support();
             this.Show();
         }
 
@@ -388,7 +371,7 @@ namespace Parcheggio.Views
         /// </summary>
         private async void Aggiorna(object sender, RoutedEventArgs e)
         {
-            GenerazioneParcheggio(4,false, LoginCompletato);
+            await GenerazioneParcheggio(4,false, LoginCompletato);
         }
 
         /// <summary>
@@ -423,7 +406,7 @@ namespace Parcheggio.Views
                         this.Hide();
                         PrimoAvvio = true;
                         LogoutEffettuato = true;
-                        SupportPrimaParte();
+                        Support();
                         Aggiorna(new { }, new RoutedEventArgs());
                         this.Show();
                         break;
