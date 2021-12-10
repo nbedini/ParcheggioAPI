@@ -52,13 +52,14 @@ namespace Parcheggio.Views
         public List<Person> ProprietariAttualmenteRegistrati { get; set; }
 
 
-        public InserimentoVeicolo(string riga,string colonna, string nomeparcheggio)
+        public InserimentoVeicolo(string riga,string colonna, string nomeparcheggio, string targa = "")
         {
             Thread thread = new Thread(new ThreadStart(RecuperoDatiDB));
             thread.Start();
             RigaSelezionata = riga;
             ColonnaSelezionata = colonna;
             NomeParcheggio = nomeparcheggio;
+            Targa = targa;
             InitializeComponent();
             this.DataContext = this;
         }
