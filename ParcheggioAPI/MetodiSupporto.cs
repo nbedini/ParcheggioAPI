@@ -14,9 +14,12 @@ namespace ParcheggioAPI
         {
             using (ParkingSystemContext model = new ParkingSystemContext())
             {
-                return model.ParkingStatusses
-                            .Where(w => w.NomeParcheggio == nomeparcheggio)
-                            .ToList();
+                if (nomeparcheggio != null)
+                    return model.ParkingStatusses
+                                .Where(w => w.NomeParcheggio == nomeparcheggio)
+                                .ToList();
+                else
+                    return null;
             }
         }
 
@@ -24,168 +27,177 @@ namespace ParcheggioAPI
         {
             var VeicoliParcheggiati = AutoParcheggiateDB(datiParcheggio.NomeParcheggio);
 
-            string riga = "", colonna = "";
-            if (datiParcheggio != null)
+            if (VeicoliParcheggiati == null)
+                return;
+            else
             {
-                #region Ottenimento auto parcheggiate con causale per il cambio parcheggio.
 
-                if (datiParcheggio.Status == 1)
+                string riga = "", colonna = "";
+                if (datiParcheggio != null)
                 {
-                    #region Controllo Righe e Colonne
+                    #region Ottenimento auto parcheggiate con causale per il cambio parcheggio.
 
-                    foreach (var v in VeicoliParcheggiati)
+                    if (datiParcheggio.Status == 1)
                     {
-                        if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) >= 10)
+                        #region Controllo Righe e Colonne
+
+                        if (datiParcheggio.CambioParcheggio)
                         {
-                            riga = "0" + v.Riga;
-                            colonna = v.Colonna;
+                            foreach (var delete in keyValues)
+                            {
+                                keyValues.Remove(delete.Key);
+                            }
                         }
-                        if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) < 10)
+                        else
                         {
-                            riga = v.Riga;
-                            colonna = "0" + v.Colonna;
+                            foreach (var v in VeicoliParcheggiati)
+                            {
+                                if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) >= 10)
+                                {
+                                    riga = "0" + v.Riga;
+                                    colonna = v.Colonna;
+                                }
+                                if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) < 10)
+                                {
+                                    riga = v.Riga;
+                                    colonna = "0" + v.Colonna;
+                                }
+                                if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) < 10)
+                                {
+                                    riga = "0" + v.Riga;
+                                    colonna = "0" + v.Colonna;
+                                }
+                                if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) >= 10)
+                                {
+                                    riga = v.Riga;
+                                    colonna = v.Colonna;
+                                }
+                                keyValues.Add(riga + colonna, v.Targa);
+                            }
                         }
-                        if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) < 10)
-                        {
-                            riga = "0" + v.Riga;
-                            colonna = "0" + v.Colonna;
-                        }
-                        if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) >= 10)
-                        {
-                            riga = v.Riga;
-                            colonna = v.Colonna;
-                        }
-                        keyValues.Add(riga + colonna, v.Targa);
-                    }
-                    if (datiParcheggio.CambioParcheggio)
-                    {
-                        foreach (var delete in keyValues)
-                        {
-                            keyValues.Remove(delete.Key);
-                        }
+
+                        #endregion
+
                     }
 
                     #endregion
 
-                }
+                    #region Eliminazione visiva del veicolo dalla vista.
 
-                #endregion
+                    else if (datiParcheggio.Status == 2)
+                    {
+                        #region Controllo Righe e Colonne
 
-                #region Eliminazione visiva del veicolo dalla vista.
+                        if (Convert.ToInt32(datiParcheggio.rigaeliminata) < 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) >= 10)
+                        {
+                            riga = "0" + datiParcheggio.rigaeliminata;
+                            colonna = datiParcheggio.colonnaeliminata;
+                        }
+                        if (Convert.ToInt32(datiParcheggio.rigaeliminata) >= 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) < 10)
+                        {
+                            riga = datiParcheggio.rigaeliminata;
+                            colonna = "0" + datiParcheggio.colonnaeliminata;
+                        }
+                        if (Convert.ToInt32(datiParcheggio.rigaeliminata) < 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) < 10)
+                        {
+                            riga = "0" + datiParcheggio.rigaeliminata;
+                            colonna = "0" + datiParcheggio.colonnaeliminata;
+                        }
+                        if (Convert.ToInt32(datiParcheggio.rigaeliminata) >= 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) >= 10)
+                        {
+                            riga = datiParcheggio.rigaeliminata;
+                            colonna = datiParcheggio.colonnaeliminata;
+                        }
 
-                else if (datiParcheggio.Status == 2)
-                {
-                    #region Controllo Righe e Colonne
+                        #endregion
 
-                    if (Convert.ToInt32(datiParcheggio.rigaeliminata) < 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) >= 10)
-                    {
-                        riga = "0" + datiParcheggio.rigaeliminata;
-                        colonna = datiParcheggio.colonnaeliminata;
-                    }
-                    if (Convert.ToInt32(datiParcheggio.rigaeliminata) >= 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) < 10)
-                    {
-                        riga = datiParcheggio.rigaeliminata;
-                        colonna = "0" + datiParcheggio.colonnaeliminata;
-                    }
-                    if (Convert.ToInt32(datiParcheggio.rigaeliminata) < 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) < 10)
-                    {
-                        riga = "0" + datiParcheggio.rigaeliminata;
-                        colonna = "0" + datiParcheggio.colonnaeliminata;
-                    }
-                    if (Convert.ToInt32(datiParcheggio.rigaeliminata) >= 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) >= 10)
-                    {
-                        riga = datiParcheggio.rigaeliminata;
-                        colonna = datiParcheggio.colonnaeliminata;
+                        keyValues.Remove(riga + colonna);
+
                     }
 
                     #endregion
 
-                    keyValues.Remove(riga + colonna);
+                    #region Inserimento veicolo con ricerca della targa tramite coordinate.
 
-                }
-
-                #endregion
-
-                #region Inserimento veicolo con ricerca della targa tramite coordinate.
-
-                else if (datiParcheggio.Status == 3)
-                {
-                    #region Controllo Righe e Colonne
-
-                    if (Convert.ToInt32(datiParcheggio.rigaeliminata) < 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) >= 10)
+                    else if (datiParcheggio.Status == 3)
                     {
-                        riga = "0" + datiParcheggio.rigaeliminata;
-                        colonna = datiParcheggio.colonnaeliminata;
-                    }
-                    if (Convert.ToInt32(datiParcheggio.rigaeliminata) >= 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) < 10)
-                    {
-                        riga = datiParcheggio.rigaeliminata;
-                        colonna = "0" + datiParcheggio.colonnaeliminata;
-                    }
-                    if (Convert.ToInt32(datiParcheggio.rigaeliminata) < 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) < 10)
-                    {
-                        riga = "0" + datiParcheggio.rigaeliminata;
-                        colonna = "0" + datiParcheggio.colonnaeliminata;
-                    }
-                    if (Convert.ToInt32(datiParcheggio.rigaeliminata) >= 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) >= 10)
-                    {
-                        riga = datiParcheggio.rigaeliminata;
-                        colonna = datiParcheggio.colonnaeliminata;
+                        #region Controllo Righe e Colonne
+
+                        if (Convert.ToInt32(datiParcheggio.rigaeliminata) < 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) >= 10)
+                        {
+                            riga = "0" + datiParcheggio.rigaeliminata;
+                            colonna = datiParcheggio.colonnaeliminata;
+                        }
+                        if (Convert.ToInt32(datiParcheggio.rigaeliminata) >= 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) < 10)
+                        {
+                            riga = datiParcheggio.rigaeliminata;
+                            colonna = "0" + datiParcheggio.colonnaeliminata;
+                        }
+                        if (Convert.ToInt32(datiParcheggio.rigaeliminata) < 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) < 10)
+                        {
+                            riga = "0" + datiParcheggio.rigaeliminata;
+                            colonna = "0" + datiParcheggio.colonnaeliminata;
+                        }
+                        if (Convert.ToInt32(datiParcheggio.rigaeliminata) >= 10 && Convert.ToInt32(datiParcheggio.colonnaeliminata) >= 10)
+                        {
+                            riga = datiParcheggio.rigaeliminata;
+                            colonna = datiParcheggio.colonnaeliminata;
+                        }
+
+                        #endregion
+
+                        using (ParkingSystemContext model = new ParkingSystemContext())
+                        {
+                            if (model.ParkingStatusses.FirstOrDefault(fod => fod.Riga == datiParcheggio.rigaeliminata && fod.Colonna == datiParcheggio.colonnaeliminata) != null)
+                            {
+                                string targa = model.ParkingStatusses.FirstOrDefault(fod => fod.Riga == datiParcheggio.rigaeliminata && fod.Colonna == datiParcheggio.colonnaeliminata).Targa;
+                                keyValues.Add(riga + colonna, targa);
+                            }
+                        }
+
                     }
 
                     #endregion
 
-                    using (ParkingSystemContext model = new ParkingSystemContext())
+                    #region Aggiornamento della vista nella pagina WPF.
+
+                    else if (datiParcheggio.Status == 4)
                     {
-                        if (model.ParkingStatusses.FirstOrDefault(fod => fod.Riga == datiParcheggio.rigaeliminata && fod.Colonna == datiParcheggio.colonnaeliminata) != null)
+                        keyValues = new Dictionary<string, string>();
+
+                        #region Controllo Righe e Colonne
+
+                        foreach (var v in VeicoliParcheggiati)
                         {
-                            string targa = model.ParkingStatusses.FirstOrDefault(fod => fod.Riga == datiParcheggio.rigaeliminata && fod.Colonna == datiParcheggio.colonnaeliminata).Targa;
-                            keyValues.Add(riga + colonna, targa);
+                            if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) >= 10)
+                            {
+                                riga = "0" + v.Riga;
+                                colonna = v.Colonna;
+                            }
+                            if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) < 10)
+                            {
+                                riga = v.Riga;
+                                colonna = "0" + v.Colonna;
+                            }
+                            if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) < 10)
+                            {
+                                riga = "0" + v.Riga;
+                                colonna = "0" + v.Colonna;
+                            }
+                            if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) >= 10)
+                            {
+                                riga = v.Riga;
+                                colonna = v.Colonna;
+                            }
+                            keyValues.Add(riga + colonna, v.Targa);
                         }
-                    }
 
-                }
+                        #endregion
 
-                #endregion
-
-                #region Aggiornamento della vista nella pagina WPF.
-
-                else if (datiParcheggio.Status == 4)
-                {
-                    keyValues = new Dictionary<string, string>();
-
-                    #region Controllo Righe e Colonne
-
-                    foreach (var v in VeicoliParcheggiati)
-                    {
-                        if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) >= 10)
-                        {
-                            riga = "0" + v.Riga;
-                            colonna = v.Colonna;
-                        }
-                        if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) < 10)
-                        {
-                            riga = v.Riga;
-                            colonna = "0" + v.Colonna;
-                        }
-                        if (Convert.ToInt32(v.Riga) < 10 && Convert.ToInt32(v.Colonna) < 10)
-                        {
-                            riga = "0" + v.Riga;
-                            colonna = "0" + v.Colonna;
-                        }
-                        if (Convert.ToInt32(v.Riga) >= 10 && Convert.ToInt32(v.Colonna) >= 10)
-                        {
-                            riga = v.Riga;
-                            colonna = v.Colonna;
-                        }
-                        keyValues.Add(riga + colonna, v.Targa);
                     }
 
                     #endregion
-
                 }
-
-                #endregion
             }
         }
 

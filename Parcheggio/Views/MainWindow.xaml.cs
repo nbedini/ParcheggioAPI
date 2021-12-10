@@ -2,6 +2,7 @@
 
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -82,10 +83,7 @@ namespace Parcheggio.Views
                 itProprietari.Visibility = Visibility.Collapsed;
             else 
                 itProprietari.Visibility = Visibility.Visible;
-            if (PrimoAvvio) 
-                await GenerazioneParcheggio(4, true, LoginCompletato);
-            else 
-                await GenerazioneParcheggio(1, false, LoginCompletato);
+            await GenerazioneParcheggio(1, false, LoginCompletato);
             LoginCompletato = false;
             this.DataContext = this;
         }
@@ -187,7 +185,13 @@ namespace Parcheggio.Views
             PrimoAvvio = true;
             NomeParcheggio = ParcheggioEsistenteScelto;
             ParcheggioEsistenteMenu = true;
-            await GenerazioneParcheggio(1, false, LoginCompletato);
+            if (!RitornoMenu)
+                await Support();
+            else
+            {
+                await GenerazioneParcheggio(1, true, LoginCompletato);
+                await GenerazioneParcheggio(1, false, LoginCompletato);
+            }
             this.Show();
         }
 
@@ -227,44 +231,49 @@ namespace Parcheggio.Views
                 };
                 var response = await client.SendAsync(request);
                 var data = JsonConvert.DeserializeObject<ValoreRitornoParcheggioView>(await response.Content.ReadAsStringAsync());
-                // Imposto dei parametri per la griglia che visualizzara' il parcheggio.
-                grid.Background = new SolidColorBrush(Colors.Gray);
-                for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
+                if (data == null)
+                    return;
+                else
                 {
-                    grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
-                }
-                for (int k = 0; k < Convert.ToInt32(data.Colonne); k++)
-                {
-                    grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(120) });
-                }
-                // Per ogni riga e colonna vado a inserirci un bottone.
-                for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
-                {
-                    for (int j = 0; j < Convert.ToInt32(data.Colonne); j++)
+                    // Imposto dei parametri per la griglia che visualizzara' il parcheggio.
+                    grid.Background = new SolidColorBrush(Colors.Gray);
+                    for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
                     {
-                        Button AreeParcheggio = new Button();
-                        AreeParcheggio.Name = "Button" + data.rigacompleta[k * Convert.ToInt32(data.Colonne)] + data.colonnacompleta[j];
-                        AreeParcheggio.Margin = new Thickness(2, 2, 0, 0);
-                        AreeParcheggio.Background = new SolidColorBrush(Colors.LimeGreen);
-                        AreeParcheggio.Click += new RoutedEventHandler(AllButtonClick);
-                        // Controllo per verificare se in quel determinato parcheggio e' presente un veicolo usando questo dizionario passatomi dall'API.
-                        foreach (var v in data.keyValues)
-                        {
-                            if (AreeParcheggio.Name == $"Button{v.Key}")
-                            {
-                                AreeParcheggio.Background = new SolidColorBrush(Colors.Red);
-                                AreeParcheggio.FontSize = 14;
-                                AreeParcheggio.FontFamily = new FontFamily("Verdana");
-                                AreeParcheggio.Content = v.Value;
-                            }
-                        }
-                        Grid.SetRow(AreeParcheggio, k);
-                        Grid.SetColumn(AreeParcheggio, j);
-                        grid.Children.Add(AreeParcheggio);
+                        grid.RowDefinitions.Add(new RowDefinition() { Height = new GridLength(30) });
                     }
-                }
-                // Per finire importo questa griglia in quella presente nel file XAML.
+                    for (int k = 0; k < Convert.ToInt32(data.Colonne); k++)
+                    {
+                        grid.ColumnDefinitions.Add(new ColumnDefinition() { Width = new GridLength(120) });
+                    }
+                    // Per ogni riga e colonna vado a inserirci un bottone.
+                    for (int k = 0; k < Convert.ToInt32(data.Righe); k++)
+                    {
+                        for (int j = 0; j < Convert.ToInt32(data.Colonne); j++)
+                        {
+                            Button AreeParcheggio = new Button();
+                            AreeParcheggio.Name = "Button" + data.rigacompleta[k * Convert.ToInt32(data.Colonne)] + data.colonnacompleta[j];
+                            AreeParcheggio.Margin = new Thickness(2, 2, 0, 0);
+                            AreeParcheggio.Background = new SolidColorBrush(Colors.LimeGreen);
+                            AreeParcheggio.Click += new RoutedEventHandler(AllButtonClick);
+                            // Controllo per verificare se in quel determinato parcheggio e' presente un veicolo usando questo dizionario passatomi dall'API.
+                            foreach (var v in data.keyValues)
+                            {
+                                if (AreeParcheggio.Name == $"Button{v.Key}")
+                                {
+                                    AreeParcheggio.Background = new SolidColorBrush(Colors.Red);
+                                    AreeParcheggio.FontSize = 14;
+                                    AreeParcheggio.FontFamily = new FontFamily("Verdana");
+                                    AreeParcheggio.Content = v.Value;
+                                }
+                            }
+                            Grid.SetRow(AreeParcheggio, k);
+                            Grid.SetColumn(AreeParcheggio, j);
+                            grid.Children.Add(AreeParcheggio);
+                        }
+                    }
+                    // Per finire importo questa griglia in quella presente nel file XAML.
                     ParcheggioView.Children.Add(grid);
+                }
             }
             else
             {
@@ -406,8 +415,9 @@ namespace Parcheggio.Views
                         this.Hide();
                         PrimoAvvio = true;
                         LogoutEffettuato = true;
-                        Support();
-                        Aggiorna(new { }, new RoutedEventArgs());
+                        await GenerazioneParcheggio(1, true, LoginCompletato);
+                        System.Windows.Forms.Application.Restart();
+                        Application.Current.Shutdown();
                         this.Show();
                         break;
                     }

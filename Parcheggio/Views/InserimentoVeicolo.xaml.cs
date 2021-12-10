@@ -82,17 +82,17 @@ namespace Parcheggio.Views
             {
                 case "Automobile":
                     {
-                        TipoVeicolo = TipiVeicoli[0];
+                        TipoVeicolo = "Automobile";
                         break;
                     }
                 case "Camion":
                     {
-                        TipoVeicolo = TipiVeicoli[1];
+                        TipoVeicolo = "Camion";
                         break;
                     }
                 case "Moto":
                     {
-                        TipoVeicolo = TipiVeicoli[2];
+                        TipoVeicolo = "Moto";
                         break;
                     }
             }
@@ -101,12 +101,14 @@ namespace Parcheggio.Views
             this.DataContext = this;
         }
 
-        public async void DatiDB()
+        public void DatiDB()
         {
-            await RecuperoDatiDB();
+            Thread thread = new Thread(new ThreadStart(RecuperoDatiDB));
+            thread.Start();
+            thread.Join();
         }
 
-        public async Task RecuperoDatiDB()
+        public async void RecuperoDatiDB()
         {
             HttpRequestMessage request = new HttpRequestMessage
             {
@@ -117,7 +119,8 @@ namespace Parcheggio.Views
             var data = JsonConvert.DeserializeObject<DatiInserimentoVeicolo>(await response.Content.ReadAsStringAsync());
             TipiVeicoli = data.TipiVeicoli;
             ProprietariAttualmenteRegistrati = data.ProprietariAttualmenteRegistrati;
-            VeicoliAttualmenteParcheggiati = data.VeicoliAttualmenteParcheggiati;    
+            VeicoliAttualmenteParcheggiati = data.VeicoliAttualmenteParcheggiati;
+            return;
         }
 
         public async Task InserimentoDatiDB()
