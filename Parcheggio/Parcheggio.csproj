@@ -213,7 +213,10 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Database.edmx</DependentUpon>
     </Compile>
+    <Compile Include="Models\DatiInserimentoVeicolo.cs" />
     <Compile Include="Models\DatiParcheggio.cs" />
+    <Compile Include="Models\InserimentoVeicoloConProprietario.cs" />
+    <Compile Include="Models\InserimentoVeicoloSenzaProprietario.cs" />
     <Compile Include="Models\LoginClass.cs" />
     <Compile Include="Models\OggettoEsciVeicolo.cs" />
     <Compile Include="Models\Parking.cs">

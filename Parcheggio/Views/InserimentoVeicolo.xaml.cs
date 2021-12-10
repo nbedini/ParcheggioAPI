@@ -1,8 +1,10 @@
-﻿using Parcheggio.Models;
+﻿using Newtonsoft.Json;
+using Parcheggio.Models;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -51,11 +53,12 @@ namespace Parcheggio.Views
         public List<ParkingStatuss> VeicoliAttualmenteParcheggiati { get; set; }
         public List<Person> ProprietariAttualmenteRegistrati { get; set; }
 
+        HttpClient client = new HttpClient();
+
 
         public InserimentoVeicolo(string riga,string colonna, string nomeparcheggio, string targa = "")
         {
-            Thread thread = new Thread(new ThreadStart(RecuperoDatiDB));
-            thread.Start();
+            DatiDB();
             RigaSelezionata = riga;
             ColonnaSelezionata = colonna;
             NomeParcheggio = nomeparcheggio;
@@ -65,8 +68,7 @@ namespace Parcheggio.Views
         }
         public InserimentoVeicolo(string riga, string colonna, string nomeparcheggio, Person propietario, Vehicle veicolo)
         {
-            Thread thread = new Thread(new ThreadStart(RecuperoDatiDB));
-            thread.Start();
+            DatiDB();
             RigaSelezionata = riga;
             ColonnaSelezionata = colonna;
             NomeParcheggio = nomeparcheggio;
@@ -80,19 +82,16 @@ namespace Parcheggio.Views
             {
                 case "Automobile":
                     {
-                        thread.Join();
                         TipoVeicolo = TipiVeicoli[0];
                         break;
                     }
                 case "Camion":
                     {
-                        thread.Join();
                         TipoVeicolo = TipiVeicoli[1];
                         break;
                     }
                 case "Moto":
                     {
-                        thread.Join();
                         TipoVeicolo = TipiVeicoli[2];
                         break;
                     }
@@ -102,61 +101,97 @@ namespace Parcheggio.Views
             this.DataContext = this;
         }
 
-        public void RecuperoDatiDB()
+        public async void DatiDB()
         {
-            using(ParkingSystemEntities model = new ParkingSystemEntities())
-            {
-                VeicoliAttualmenteParcheggiati = model.ParkingStatusses
-                    .ToList();
-
-                ProprietariAttualmenteRegistrati = model.Persons
-                    .ToList();
-
-                foreach (var v in model.ParkingCosts)
-                {
-                    TipiVeicoli.Add(v.TipoVeicolo);
-                }
-            }
+            await RecuperoDatiDB();
         }
 
-        public void InserimentoDatiDB()
+        public async Task RecuperoDatiDB()
         {
-            using (ParkingSystemEntities model = new ParkingSystemEntities())
+            HttpRequestMessage request = new HttpRequestMessage
             {
-                Person person = new Person { Nome = this.Nome, Cognome = this.Cognome, DataNascita = this.DataNascita, CodiceFiscale = this.CodiceFiscale };
-
-                model.Persons
-                    .Add(person);
-                model.Vehicles
-                    .Add(new Vehicle { Marca = this.Marca, Modello = this.Modello, Targa = this.Targa, Propietario = this.CodiceFiscale, TipoVeicolo = this.TipoVeicolo });
-                model.ParkingStatusses
-                        .Add(new ParkingStatuss { Targa = this.Targa, Riga = this.RigaSelezionata, Colonna = this.ColonnaSelezionata, DataOrarioEntrata = DateTime.Now, NomeParcheggio = this.NomeParcheggio, TipoVeicolo = this.TipoVeicolo });
-                model.SaveChanges();
-            }
+                Method = HttpMethod.Get,
+                RequestUri = new Uri($"http://localhost:31329/api/datiDB")
+            };
+            var response = await client.SendAsync(request);
+            var data = JsonConvert.DeserializeObject<DatiInserimentoVeicolo>(await response.Content.ReadAsStringAsync());
+            TipiVeicoli = data.TipiVeicoli;
+            ProprietariAttualmenteRegistrati = data.ProprietariAttualmenteRegistrati;
+            VeicoliAttualmenteParcheggiati = data.VeicoliAttualmenteParcheggiati;    
         }
 
-        public void InserimentoDatiDBConProprietarioEsistente()
+        public async Task InserimentoDatiDB()
         {
-            using (ParkingSystemEntities model = new ParkingSystemEntities())
+            HttpRequestMessage request = new HttpRequestMessage
             {
-                if (model.Vehicles.Where(w => w.Targa == this.Targa).Count() == 0)
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"http://localhost:31329/api/inserimentoveicolo"),
+                Content = new StringContent(JsonConvert.SerializeObject(new InserimentoVeicoloConProprietario
                 {
-                    model.Vehicles
-                        .Add(new Vehicle { Marca = this.Marca, Modello = this.Modello, Targa = this.Targa, Propietario = this.CodiceFiscale, TipoVeicolo = this.TipoVeicolo });
-                    model.ParkingStatusses
-                        .Add(new ParkingStatuss { Targa = this.Targa, Riga = this.RigaSelezionata, Colonna = this.ColonnaSelezionata, DataOrarioEntrata = DateTime.Now, NomeParcheggio = this.NomeParcheggio, TipoVeicolo = this.TipoVeicolo });
-                    model.SaveChanges();
-                }
-                else
-                {
-                    model.ParkingStatusses
-                        .Add(new ParkingStatuss { Targa = this.Targa, Riga = this.RigaSelezionata, Colonna = this.ColonnaSelezionata, DataOrarioEntrata = DateTime.Now, NomeParcheggio = this.NomeParcheggio, TipoVeicolo = this.TipoVeicolo });
-                    model.SaveChanges();
-                }
-            }
+                    Person = new Person
+                    {
+                        CodiceFiscale = this.CodiceFiscale,
+                        Nome = this.Nome,
+                        Cognome = this.Cognome,
+                        DataNascita = this.DataNascita
+                    },
+                    Veicolo = new Vehicle
+                    {
+                        Marca = this.Marca,
+                        Modello = this.Modello,
+                        Targa = this.Targa,
+                        Propietario = this.CodiceFiscale,
+                        TipoVeicolo = this.TipoVeicolo
+                    },
+                    TabellaInserimento = new ParkingStatuss
+                    {
+                        Targa = this.Targa,
+                        Riga = RigaSelezionata,
+                        Colonna = ColonnaSelezionata,
+                        DataOrarioEntrata = DateTime.Now,
+                        NomeParcheggio = this.NomeParcheggio,
+                        TipoVeicolo = this.TipoVeicolo
+                    }
+                }), Encoding.UTF8, "application/json")
+            };
+            var response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+                return;
         }
 
-        private void ConfermaClick(object sender, RoutedEventArgs e)
+        public async Task InserimentoDatiDBConProprietarioEsistente()
+        {
+            HttpRequestMessage request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri($"http://localhost:31329/api/inserimentoveicolosenzaproprietario"),
+                Content = new StringContent(JsonConvert.SerializeObject(new InserimentoVeicoloSenzaProprietario
+                {
+                    Veicolo = new Vehicle
+                    {
+                        Marca = this.Marca,
+                        Modello = this.Modello,
+                        Targa = this.Targa,
+                        Propietario = this.CodiceFiscale,
+                        TipoVeicolo = this.TipoVeicolo
+                    },
+                    TabellaInserimento = new ParkingStatuss
+                    {
+                        Targa = this.Targa,
+                        Riga = RigaSelezionata,
+                        Colonna = ColonnaSelezionata,
+                        DataOrarioEntrata = DateTime.Now,
+                        NomeParcheggio = this.NomeParcheggio,
+                        TipoVeicolo = this.TipoVeicolo
+                    }
+                }), Encoding.UTF8, "application/json")
+            };
+            var response = await client.SendAsync(request);
+            if (response.IsSuccessStatusCode)
+                return;
+        }
+
+        private async void ConfermaClick(object sender, RoutedEventArgs e)
         {
             if (Nome != null && Cognome != null && CodiceFiscale != null && Marca != null && Modello != null && Targa != null)
             {
@@ -174,12 +209,12 @@ namespace Parcheggio.Views
 
                     if (p.CodiceFiscale == CodiceFiscale)
                     {
-                        InserimentoDatiDBConProprietarioEsistente();
+                        await InserimentoDatiDBConProprietarioEsistente();
                         this.Close();
                         return;
                     }
                 }
-                InserimentoDatiDB();
+                await InserimentoDatiDB();
                 this.Close();
             }
             else

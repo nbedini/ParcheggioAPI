@@ -14,106 +14,129 @@ namespace ParcheggioAPI.Controllers
     public class InserimentoVeicoloController : Controller
     {
         public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
-        //Liste di dati Contenuti nel DB
-        public List<ParkingStatuss> VeicoliAttualmenteParcheggiati { get; set; }
 
-        private List<Person> proprietariattualmenteregistrati;
-
-        public List<Person> ProprietariAttualmenteRegistrati
+        [HttpGet("/api/datiDB")]
+        public ActionResult DatiDB()
         {
-            get { return proprietariattualmenteregistrati; }
-            set { proprietariattualmenteregistrati = value; }
-        }
-
-
-        [HttpPut("api/inserisciveicolo")]
-        public IActionResult Inserimento([FromBody] OggettoEntrata o)
-        {
-            //Facciamo una verifica dei dati inseriti del Proprietario e del veicolo, che vogliono parcheggiare la macchina
-            //Verifichiamo che i dati forniti siano completi
-            if (o.Proprietario.Nome != null && o.Proprietario.Cognome != null && o.Proprietario.CodiceFiscale != null && o.Veicolo.Marca != null && o.Veicolo.Modello != null && o.Veicolo.Targa != null)
+            using (ParkingSystemContext model = new ParkingSystemContext())
             {
-                //Scarichiamo i dati dal DB
-                VeicoliAttualmenteParcheggiati = MetodiSupporto.RecuperoDatiDB(out proprietariattualmenteregistrati);
+                List<string> tv = new List<string>();
 
-                //Controlliamo se il DB non ha scaricato nulla
-                if(VeicoliAttualmenteParcheggiati == null || ProprietariAttualmenteRegistrati == null)
+                var VeicoliAttualmenteParcheggiati = model.ParkingStatusses
+                    .ToList();
+
+                var ProprietariAttualmenteRegistrati = model.Persons
+                    .ToList();
+
+                foreach (var v in model.ParkingCosts)
                 {
-                    return NotFound();
+                    tv.Add(v.TipoVeicolo);
                 }
 
-                using (ParkingSystemContext model = new ParkingSystemContext())
+                DatiInserimentoVeicolo datiInserimento = new DatiInserimentoVeicolo
                 {
-                    //Facciamo un ulteriore controllo sui veicoli attualmente parcheggiati
-                    //Lo stesso veicolo non può parcheggiare in più posti contemporaneamente
-                    foreach (ParkingStatuss p in VeicoliAttualmenteParcheggiati)
-                    {
-                        if (p.Targa == o.Veicolo.Targa)
-                        {
-                            logger.Log(LogLevel.Error, "Tentato inserimento di una macchina già presente nel parcheggio.");
-                            return Problem("Impossibile inserire due volte la stessa targa nel parcheggio");
-                        }
-                    }
-                    //Facciamo un ulteriore controllo sui Proprietari attualmente presenti nel DB
-                    foreach (Person person in ProprietariAttualmenteRegistrati)
-                    {
-                        //Caso in cui il proprietario sia presente nel DB
-                        if (person.CodiceFiscale == o.Proprietario.CodiceFiscale)
-                        {
-                            //Caso in cui la targa del veicolo, quindi il veicolo non sia presente nel DB dei veicoli
-                            if (model.Vehicles.Where(w => w.Targa == o.Veicolo.Targa).Count() == 0)
-                            {
-                                model.Vehicles
-                                    .Add(new Vehicle { Marca = o.Veicolo.Marca, Modello = o.Veicolo.Modello, Targa = o.Veicolo.Targa, Propietario = o.Proprietario.CodiceFiscale, TipoVeicolo = o.Veicolo.TipoVeicolo });
-                                model.ParkingStatusses
-                                    .Add(new ParkingStatuss { Targa = o.Veicolo.Targa, Riga = o.RigaSelezionata, Colonna = o.ColonnaSelezionata, DataOrarioEntrata = DateTime.Now, NomeParcheggio = o.NomeParcheggioSelezionato, TipoVeicolo = o.Veicolo.TipoVeicolo });
-                                model.SaveChanges();
-                            }
-                            else //Caso in cui la targa del veicolo è presente nel DB dei Veicoli
-                            {
-                                model.ParkingStatusses
-                                    .Add(new ParkingStatuss { Targa = o.Veicolo.Targa, Riga = o.RigaSelezionata, Colonna = o.ColonnaSelezionata, DataOrarioEntrata = DateTime.Now, NomeParcheggio = o.NomeParcheggioSelezionato, TipoVeicolo = o.Veicolo.TipoVeicolo });
-                                model.SaveChanges();
-                            }
-                            logger.Log(LogLevel.Info, "Macchina con targa {targa} inserita correttamente", o.Veicolo.Targa);
-                            return Ok();
-                        }
-                    }
+                    ProprietariAttualmenteRegistrati = ProprietariAttualmenteRegistrati,
+                    VeicoliAttualmenteParcheggiati = VeicoliAttualmenteParcheggiati,
+                    TipiVeicoli = tv
+                };
 
-                    //Inserimento dei dati nel DB: Caso in cui il Proprietario non sia registrato nel DB
-                    Person persona = new Person { Nome = o.Proprietario.Nome, Cognome = o.Proprietario.Cognome, DataNascita = o.Proprietario.DataNascita, CodiceFiscale = o.Proprietario.CodiceFiscale };
+                if (ProprietariAttualmenteRegistrati != null && VeicoliAttualmenteParcheggiati != null && tv != null)
+                    return Ok(datiInserimento);
+                else
+                    return BadRequest();
+            }
+        }
 
-                    model.Persons
-                        .Add(persona);
-                    model.Vehicles
-                        .Add(new Vehicle { Marca = o.Veicolo.Marca, Modello = o.Veicolo.Modello, Targa = o.Veicolo.Targa, Propietario = o.Proprietario.CodiceFiscale, TipoVeicolo = o.Veicolo.TipoVeicolo });
-                    model.ParkingStatusses
-                            .Add(new ParkingStatuss { Targa = o.Veicolo.Targa, Riga = o.RigaSelezionata, Colonna = o.ColonnaSelezionata, DataOrarioEntrata = DateTime.Now, NomeParcheggio = o.NomeParcheggioSelezionato, TipoVeicolo = o.Veicolo.TipoVeicolo });
+        [HttpPost("/api/inserimentoveicolo")]
+        public ActionResult InserimentoVeicolo([FromBody]InserimentoVeicoloConProprietario inserimentoVeicolo)
+        {
+            using (ParkingSystemContext model = new ParkingSystemContext())
+            {
+                try
+                {
+                    model.Persons.Add(new Person
+                    {
+                        Nome = inserimentoVeicolo.Person.Nome,
+                        Cognome = inserimentoVeicolo.Person.Cognome,
+                        DataNascita = inserimentoVeicolo.Person.DataNascita,
+                        CodiceFiscale = inserimentoVeicolo.Person.CodiceFiscale
+                    });
+                    model.Vehicles.Add(new Vehicle
+                    {
+                        Marca = inserimentoVeicolo.Veicolo.Marca,
+                        Modello = inserimentoVeicolo.Veicolo.Modello,
+                        Targa = inserimentoVeicolo.Veicolo.Targa,
+                        Propietario = inserimentoVeicolo.Veicolo.Propietario,
+                        TipoVeicolo = inserimentoVeicolo.Veicolo.TipoVeicolo
+                    });
+                    model.ParkingStatusses.Add(new ParkingStatuss
+                    {
+                        Targa = inserimentoVeicolo.TabellaInserimento.Targa,
+                        Riga = inserimentoVeicolo.TabellaInserimento.Riga,
+                        Colonna = inserimentoVeicolo.TabellaInserimento.Colonna,
+                        DataOrarioEntrata = inserimentoVeicolo.TabellaInserimento.DataOrarioEntrata,
+                        NomeParcheggio = inserimentoVeicolo.TabellaInserimento.NomeParcheggio,
+                        TipoVeicolo = inserimentoVeicolo.TabellaInserimento.TipoVeicolo
+                    });
                     model.SaveChanges();
-                    logger.Log(LogLevel.Info, "Macchina con targa {targa} inserita correttamente",o.Veicolo.Targa);
-                    
                     return Ok();
                 }
-            }
-            else
-            {
-                logger.Log(LogLevel.Error, "Problema nell'inserimento di una macchina.");
-                return Problem("Non sono stati inseriti i dati in modo corretto");
+                catch (Exception)
+                {
+                    return Problem();
+                }
             }
         }
 
-
-
-        //Creiamo l'oggetto OggettoEntrata che conterrà i dati del parcheggio selezionato, e del Proprietario del veicolo con il relativo mezzo
-        
-            
-    }
-    public class OggettoEntrata
-    {
-        public string NomeParcheggioSelezionato { get; set; }
-        public string ColonnaSelezionata { get; set; }
-        public string RigaSelezionata { get; set; }
-        public Person Proprietario { get; set; }
-        public Vehicle Veicolo { get; set; }
+        [HttpPost("/api/inserimentoveicolosenzaproprietario")]
+        public ActionResult InserimentoVeicolo([FromBody] InserimentoVeicoloSenzaProprietario inserimentoVeicolo)
+        {
+            using (ParkingSystemContext model = new ParkingSystemContext())
+            {
+                try
+                {
+                    if (model.Vehicles.Where(w => w.Targa == inserimentoVeicolo.Veicolo.Targa).Count() == 0)
+                    {
+                        model.Vehicles.Add(new Vehicle
+                        {
+                            Marca = inserimentoVeicolo.Veicolo.Marca,
+                            Modello = inserimentoVeicolo.Veicolo.Modello,
+                            Targa = inserimentoVeicolo.Veicolo.Targa,
+                            Propietario = inserimentoVeicolo.Veicolo.Propietario,
+                            TipoVeicolo = inserimentoVeicolo.Veicolo.TipoVeicolo
+                        });
+                        model.ParkingStatusses.Add(new ParkingStatuss
+                        {
+                            Targa = inserimentoVeicolo.TabellaInserimento.Targa,
+                            Riga = inserimentoVeicolo.TabellaInserimento.Riga,
+                            Colonna = inserimentoVeicolo.TabellaInserimento.Colonna,
+                            DataOrarioEntrata = inserimentoVeicolo.TabellaInserimento.DataOrarioEntrata,
+                            NomeParcheggio = inserimentoVeicolo.TabellaInserimento.NomeParcheggio,
+                            TipoVeicolo = inserimentoVeicolo.TabellaInserimento.TipoVeicolo
+                        });
+                        model.SaveChanges();
+                        return Ok();
+                    }
+                    else
+                    {
+                        model.ParkingStatusses.Add(new ParkingStatuss 
+                            { 
+                            Targa = inserimentoVeicolo.TabellaInserimento.Targa, 
+                            Riga = inserimentoVeicolo.TabellaInserimento.Riga, 
+                            Colonna = inserimentoVeicolo.TabellaInserimento.Colonna, 
+                            DataOrarioEntrata = inserimentoVeicolo.TabellaInserimento.DataOrarioEntrata,
+                            NomeParcheggio = inserimentoVeicolo.TabellaInserimento.NomeParcheggio, 
+                            TipoVeicolo = inserimentoVeicolo.TabellaInserimento.TipoVeicolo 
+                        });
+                        model.SaveChanges();
+                        return Ok();
+                    }
+                }
+                catch (Exception)
+                {
+                    return Problem();
+                }
+            }
+        }
     }
 }
