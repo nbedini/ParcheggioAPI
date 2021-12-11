@@ -42,7 +42,7 @@
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="2" Height="60" Grid.Row="3" Content="Registratrazione" FontSize="20" Click="SubmitClick"/>
                 <TextBlock HorizontalAlignment="Center" Text="Possiedi già un account?" Grid.Row="1" Grid.Column="0" FontSize="20"/>
-                <Button Grid.Column="0" Height="60" Grid.Row="3" Content="Login" Margin="50,0,50,0" FontSize="20" Click="SubmitClick"/>
+                <Button Grid.Column="0" Height="60" Grid.Row="3" Content="Login" Margin="50,0,50,0" FontSize="20" Click="LoginClick"/>
 
             </Grid>
         </StackPanel>

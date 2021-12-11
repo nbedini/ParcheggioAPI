@@ -111,6 +111,7 @@ namespace Parcheggio.Views
                     LoginCompletato = RegistrazioneView.StatusChiusura;
                     if (SwitchRegistrazioneLogin)
                     {
+                        LogoutEffettuato = true;
                         continue;
                     }
                     else
