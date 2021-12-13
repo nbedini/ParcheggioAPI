@@ -78,6 +78,7 @@ namespace ParcheggioAPI.Controllers
                         NomeParcheggio = inserimentoVeicolo.TabellaInserimento.NomeParcheggio,
                         TipoVeicolo = inserimentoVeicolo.TabellaInserimento.TipoVeicolo
                     });
+                    logger.Log(LogLevel.Info, "Inserimento veicolo con targa {targa} completato.", inserimentoVeicolo.Veicolo.Targa);
                     model.SaveChanges();
                     return Ok();
                 }
