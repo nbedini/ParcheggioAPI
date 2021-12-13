@@ -449,7 +449,6 @@ namespace Parcheggio.Views
                         this.Hide();
                         PrimoAvvio = true;
                         LogoutEffettuato = true;
-                        await GenerazioneParcheggio(1, true, LoginCompletato);
                         System.Windows.Forms.Application.Restart();
                         Application.Current.Shutdown();
                         this.Show();
