@@ -65,7 +65,12 @@ namespace Parcheggio.Views
 
         public async Task PostInsertNewParking()
         {
-            HttpResponseMessage response = await client.PostAsync("http://localhost:31329/api/parking/create", new StringContent( JsonConvert.SerializeObject(new { Righe = this.Righe, Colonne = this.Colonne, NomeParcheggio = this.NomeParcheggio }), Encoding.UTF8, "application/json"));
+            HttpResponseMessage response = await client.PostAsync("http://localhost:31329/api/parking/create", new StringContent( JsonConvert.SerializeObject(new 
+            { 
+                Righe = this.Righe, 
+                Colonne = this.Colonne, 
+                NomeParcheggio = this.NomeParcheggio 
+            }), Encoding.UTF8, "application/json"));
             if(response.IsSuccessStatusCode)
             {
                 MessageBox.Show("Creazione andata a buon fine");

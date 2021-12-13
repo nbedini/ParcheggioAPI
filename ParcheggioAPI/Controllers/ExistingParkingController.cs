@@ -18,11 +18,6 @@ namespace ParcheggioAPI.Controllers
         [HttpGet("/api/existing")]
         public ActionResult ExistingParking()
         {
-            //Controllo Autenticazione
-
-            //if() { return Unauthorized("Accesso negato"); }
-
-
             using (ParkingSystemContext model = new ParkingSystemContext())
             {
                 List<string> displayParking = model.Parkings.Select(s => s.NomeParcheggio)
@@ -34,10 +29,6 @@ namespace ParcheggioAPI.Controllers
         [HttpDelete("/api/remove")]
         public ActionResult RemoveParking([FromBody] string parking)
         {
-            //Controllo Autenticazione
-
-            //if() { return Unauthorized("Accesso negato"); }
-
             if (parking == null) 
             {
                 logger.Log(LogLevel.Error, "Tentata eliminazione di un parcheggio non esistente");
