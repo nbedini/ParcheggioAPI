@@ -111,11 +111,11 @@ namespace Parcheggio.Views
                 if (SwitchLoginRegistrazione)
                 {
                     Registrazione RegistrazioneView = new Registrazione();
-                    RegistrazioneView.ShowDialog();
-                    UserLoggato = RegistrazioneView.UsernameRegistrato;
+                    RegistrazioneView.ShowDialog();//apertura pagina registrazione
+                    UserLoggato = RegistrazioneView.UsernameRegistrato;//salvo username persona registrata
                     SwitchRegistrazioneLogin = RegistrazioneView.SwitchLogin;
                     LoginCompletato = RegistrazioneView.StatusChiusura;
-                    if (SwitchRegistrazioneLogin)
+                    if (SwitchRegistrazioneLogin)//verifica se la registrazione è andata a buon fine
                     {
                         LogoutEffettuato = true;
                         continue;
