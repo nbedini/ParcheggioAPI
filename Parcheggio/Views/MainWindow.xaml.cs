@@ -24,6 +24,7 @@ namespace Parcheggio.Views
 
         // Dichiarazione delle proprieta' e interfacce.
 
+        public bool ChiusuraSenzaSelezioneLogin { get; set; } = true;
         public bool RitornoMenu { get; set; } = false;
         public bool LoginCompletato { get; set; } = true;
         public bool PrimoAvvio { get; set; } = false;
@@ -99,9 +100,14 @@ namespace Parcheggio.Views
                 LoginCompletato = LoginView.LoginCompletato;
                 UserLoggato = LoginView.UsernameLogin;
                 AdminYesONo = LoginView.Risposta;
+                ChiusuraSenzaSelezioneLogin = LoginView.ChiusuraSenzaSelezione;
                 LoginChiusuraSenzaCompletamento = LoginView.LoginEffettuatoChiusuraForm;
                 SwitchLoginRegistrazione = LoginView.SwitchRegistrazione;
                 LogoutEffettuato = false;
+                if (ChiusuraSenzaSelezioneLogin)
+                {
+                    break;
+                }
                 if (SwitchLoginRegistrazione)
                 {
                     Registrazione RegistrazioneView = new Registrazione();
@@ -124,7 +130,12 @@ namespace Parcheggio.Views
                     break;
                 }
             }
-            Support();
+            if (ChiusuraSenzaSelezioneLogin)
+            {
+                Application.Current.Shutdown();
+            }
+            else
+                Support();
         }
 
         #endregion

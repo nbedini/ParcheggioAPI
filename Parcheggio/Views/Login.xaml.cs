@@ -24,6 +24,7 @@ namespace Parcheggio.Views
     /// </summary>
     public partial class Login : Window
     {
+        public bool ChiusuraSenzaSelezione { get; set; } = true;
         public bool LoginCompletato { get; set; } = false;
         public string UsernameForm { get; set; }
         public string UsernameLogin { get; set; }
@@ -39,6 +40,7 @@ namespace Parcheggio.Views
 
         private async void SubmitClick(object sender, RoutedEventArgs e)
         {
+            ChiusuraSenzaSelezione = false;
             string password = tbPassword.Password;
             object candidato = new User { Username = UsernameForm, Password = password};
             var request = new HttpRequestMessage
@@ -82,6 +84,7 @@ namespace Parcheggio.Views
 
         private void RegistrazioneClick(object sender, RoutedEventArgs e)
         {
+            ChiusuraSenzaSelezione = false;
             SwitchRegistrazione = true;
             this.Close();
         }
