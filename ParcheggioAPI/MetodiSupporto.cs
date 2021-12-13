@@ -150,7 +150,7 @@ namespace ParcheggioAPI
                         {
                             if (model.ParkingStatusses.FirstOrDefault(fod => fod.Riga == datiParcheggio.rigaeliminata && fod.Colonna == datiParcheggio.colonnaeliminata) != null)
                             {
-                                string targa = model.ParkingStatusses.FirstOrDefault(fod => fod.Riga == datiParcheggio.rigaeliminata && fod.Colonna == datiParcheggio.colonnaeliminata).Targa;
+                                string targa = model.ParkingStatusses.FirstOrDefault(fod => fod.Riga == datiParcheggio.rigaeliminata && fod.Colonna == datiParcheggio.colonnaeliminata && fod.NomeParcheggio == datiParcheggio.NomeParcheggio).Targa;
                                 keyValues.Add(riga + colonna, targa);
                             }
                         }
