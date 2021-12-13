@@ -15,45 +15,32 @@ namespace ParcheggioAPI.Controllers
     {
         public Logger logger { get; set; } = LogManager.GetCurrentClassLogger();
         [HttpGet]
-        [Route("/api/checkTarga")]
-        public IActionResult ControlloTarga([FromBody] string targaVeicolo)
+        [Route("/api/checkTarga/{targaVeicolo}")]
+        public IActionResult ControlloTarga(string targaVeicolo)
         {
-            //facciamo un controllo sulla lunghezza dei caratteri della targa
-            if (targaVeicolo.Length == 7)
+            string CodiceFiscale = "";
+            using (ParkingSystemContext model = new ParkingSystemContext())
             {
-                using (ParkingSystemContext model = new ParkingSystemContext())
+                if (model.Vehicles.FirstOrDefault(fod => fod.Targa == targaVeicolo) != null)
                 {
-                    //Verifico se nel DB sia presente un veicolo con la targa riportata
-                    string targa = model.Vehicles.FirstOrDefault(f => f.Targa == targaVeicolo).Targa;
-                    if (targa == null)
-                    {
-                        logger.Log(NLog.LogLevel.Error, "Veicolo non trovato");
-                        return NotFound("Veicolo non trovato");
-                    }
+                    CodiceFiscale = model.Vehicles.FirstOrDefault(fod => fod.Targa == targaVeicolo).Propietario;
 
-                    //genero il pattern della targa, sappiamo che ha due caratteri
-                    //alfabetici, seguiti da 3 caratteri numerici e altri due caratteri alfabetici (es. FF 456 JT)
-                    Regex patternTarga = new Regex(@"^[A-Za-z]{2}[0-9]{3}[A-Za-z]{2}");
-
-                    //Definito il pattern della targa Europea, controlliamo se la targa del veicolo lo rispetta
-                    if (Regex.IsMatch(targa, patternTarga.ToString()) == true)
+                    DatiControlloTarga controlloTargaObject = new DatiControlloTarga
                     {
-                        logger.Log(NLog.LogLevel.Info, "Macchina con targa {targa} inserita.", targa);
-                        return Ok("La targa inserita è corretta e rispetta il pattern Europeo");
-                    }
-                    else
-                    {
-                        logger.Log(NLog.LogLevel.Error, "Veicolo non trovato.");
-                        return Content("La targa riportata non corrisponde al pattern Europeo, probabilmente è una targa personalizzata");
-                    }
+                        Proprietario = model.Persons
+                            .Select(s => new Person { CodiceFiscale = s.CodiceFiscale, Cognome = s.Cognome , DataNascita = s.DataNascita , Nome = s.Nome })
+                            .FirstOrDefault(fod => fod.CodiceFiscale == CodiceFiscale),
+                        Veicolo = model.Vehicles
+                            .Select(s => new Vehicle { Marca = s.Marca , Modello = s.Modello , Targa = s.Targa , TipoVeicolo = s.TipoVeicolo })
+                            .FirstOrDefault(fod => fod.Targa == targaVeicolo)
+                    };
+                    return Ok(controlloTargaObject);                    
+                }
+                else
+                {
+                    return NotFound();
                 }
             }
-            else
-            {
-                logger.Log(NLog.LogLevel.Error, "Veicolo non trovato.");
-                return Problem("La targa del veicolo non contiene il numero corretto di caratteri, controllare ");
-            }
-
         }
     }
 }
