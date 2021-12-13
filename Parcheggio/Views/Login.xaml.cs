@@ -66,7 +66,7 @@ namespace Parcheggio.Views
                 var response2 = await client.SendAsync(request2);
                 var risposta = await response2.Content.ReadAsStringAsync();
                 Risposta = Boolean.Parse(risposta);
-                LoginEffettuatoChiusuraForm = true;
+                LoginEffettuatoChiusuraForm = true;//segna che il login è avvenuto correttamente
                 LoginCompletato = true;
                 UsernameLogin = Properties.Settings.Username;
                 this.Close();

@@ -95,21 +95,21 @@ namespace Parcheggio.Views
             while (LogoutEffettuato)
             {
                 Login LoginView = new Login();
-                LoginView.ShowDialog();
-                LoginCompletato = LoginView.LoginCompletato;
-                UserLoggato = LoginView.UsernameLogin;
-                AdminYesONo = LoginView.Risposta;
+                LoginView.ShowDialog();//apertura della pagina di login
+                LoginCompletato = LoginView.LoginCompletato;//verifico che il login sia stato effettuato attraverso il bool presente nella pagina di login
+                UserLoggato = LoginView.UsernameLogin;//salvo username persona loggata
+                AdminYesONo = LoginView.Risposta;//verifico se l'utente loggato è admin o meno
                 LoginChiusuraSenzaCompletamento = LoginView.LoginEffettuatoChiusuraForm;
                 SwitchLoginRegistrazione = LoginView.SwitchRegistrazione;
                 LogoutEffettuato = false;
-                if (SwitchLoginRegistrazione)
+                if (SwitchLoginRegistrazione)//se utente ha cliccato su registrazione
                 {
                     Registrazione RegistrazioneView = new Registrazione();
-                    RegistrazioneView.ShowDialog();
-                    UserLoggato = RegistrazioneView.UsernameRegistrato;
+                    RegistrazioneView.ShowDialog();//apertura pagina registrazione
+                    UserLoggato = RegistrazioneView.UsernameRegistrato;//salvo username persona registrata
                     SwitchRegistrazioneLogin = RegistrazioneView.SwitchLogin;
                     LoginCompletato = RegistrazioneView.StatusChiusura;
-                    if (SwitchRegistrazioneLogin)
+                    if (SwitchRegistrazioneLogin)//verifica se la registrazione è andata a buon fine
                     {
                         LogoutEffettuato = true;
                         continue;
