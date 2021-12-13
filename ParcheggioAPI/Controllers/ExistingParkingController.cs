@@ -43,10 +43,46 @@ namespace ParcheggioAPI.Controllers
 
                 if(removeParking == null) { return NotFound(); }
 
-                model.Parkings.Remove(removeParking);
-                model.SaveChanges();
-                logger.Log(LogLevel.Info, "Eliminazione del parcheggio {parcheggio}",removeParking.NomeParcheggio);
-                return Ok("Parcheggio rimosso con successo");
+                var autostorico = model.ParkingHistorys.Where(w => w.NomeParcheggio == parking).ToList();
+                var autoparcheggiate = model.ParkingStatusses.Where(w => w.NomeParcheggio == parking).ToList();
+                var incassistorico = model.ParkingAmounts.Where(w => w.NomeParcheggio == parking).ToList();
+
+                if (autostorico.Count > 0 || autoparcheggiate.Count > 0 || incassistorico.Count > 0)
+                {
+                    foreach (var v in autostorico)
+                    {
+                        model.ParkingHistorys.Remove(v);
+                        model.SaveChanges();
+                    }
+                    foreach (var v in autoparcheggiate)
+                    {
+                        model.ParkingStatusses.Remove(v);
+                        model.SaveChanges();
+                    }
+                    foreach (var v in incassistorico)
+                    {
+                        model.ParkingAmounts.Remove(v);
+                        model.SaveChanges();
+                    }
+                    if (model.ParkingHistorys.Where(w => w.NomeParcheggio == parking).Count() == 0 && model.ParkingStatusses.Where(w => w.NomeParcheggio == parking).Count() == 0)
+                    {
+                        model.Parkings.Remove(removeParking);
+                        model.SaveChanges();
+                        logger.Log(LogLevel.Info, "Eliminazione del parcheggio {parcheggio}", removeParking.NomeParcheggio);
+                        return Ok("Parcheggio rimosso con successo");
+                    }
+                    else
+                    {
+                        return Problem();
+                    }
+                }
+                else
+                {
+                    model.Parkings.Remove(removeParking);
+                    model.SaveChanges();
+                    logger.Log(LogLevel.Info, "Eliminazione del parcheggio {parcheggio}", removeParking.NomeParcheggio);
+                    return Ok("Parcheggio rimosso con successo");
+                }
             }
         }
     }
