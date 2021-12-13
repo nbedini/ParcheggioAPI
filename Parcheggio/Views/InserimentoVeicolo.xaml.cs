@@ -48,8 +48,14 @@ namespace Parcheggio.Views
                 OnPropertyChanged("TipoVeicolo");
             }
         }
+        private List<string> tipiveicoli;   
 
-        public List<string> TipiVeicoli { get; set; } = new List<string>();
+        public List<string> TipiVeicoli
+        {
+            get { return tipiveicoli; }
+            set { tipiveicoli = value; OnPropertyChanged("TipiVeicoli"); }
+        }
+
         public List<ParkingStatuss> VeicoliAttualmenteParcheggiati { get; set; }
         public List<Person> ProprietariAttualmenteRegistrati { get; set; }
 
@@ -68,6 +74,7 @@ namespace Parcheggio.Views
         }
         public InserimentoVeicolo(string riga, string colonna, string nomeparcheggio, Person propietario, Vehicle veicolo)
         {
+            TipiVeicoli = new List<string>();
             DatiDB();
             RigaSelezionata = riga;
             ColonnaSelezionata = colonna;
