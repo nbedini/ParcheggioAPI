@@ -59,6 +59,7 @@ namespace Parcheggio.Views
             }
             else
             {
+                ChiusuraconBottone = true;
                 InserimentoVeicolo inserimentoVeicoloView = new InserimentoVeicolo(Riga, Colonna, NomeParcheggio, Targa);
                 inserimentoVeicoloView.ShowDialog();
                 this.Close();
