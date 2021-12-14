@@ -224,6 +224,8 @@ namespace Parcheggio.Views
                 VeicoliAttuali.Visibility = Visibility.Visible;
                 aggiorna.Visibility = Visibility.Visible;
                 storico.Visibility = Visibility.Visible;
+                if (!AdminYesONo)
+                    itProprietari.Visibility = Visibility.Collapsed;
                 // Creo una richiesta di tipo POST e come body gli spedisco un oggetto di tipo DatiParcheggio.
                 // Dopo aver mandato la richiesta converto nel tipo di dato che mi interessa la stringa di risposta.
                 HttpRequestMessage request = new HttpRequestMessage
@@ -296,7 +298,6 @@ namespace Parcheggio.Views
                 VeicoliAttuali.Visibility = Visibility.Collapsed;
                 aggiorna.Visibility = Visibility.Collapsed;
                 storico.Visibility = Visibility.Collapsed;
-                
                 if (AdminYesONo)
                 {
                     for (int i = 0; i < 5; i++)
